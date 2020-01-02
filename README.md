@@ -1,5 +1,5 @@
 # finalsystems
-Systems Level Programming Final Project
+Systems Level Programming Final Project\
 Angelique Charles-Davis, Lauren Pehlivanian, Claire Tempelman
 
 A statement of the problem you are solving and/or a high level description of the project:\
