@@ -17,12 +17,13 @@ How you will be using the topics covered in class in the project.
   - displaying song info (length, artist, location in drive) will require finding out info about the file
 
 How you are breaking down the project and who is responsible for which parts.
-1. Constructing a linked list based on actual mp3 files (reworking myTunes)
-2. Seeking mp3 files in a given directory
-3. Figuring out how to get data like artist and album from an mp3 file
-4. Creating playlists from a user input using shared memory
-5. Implementing a semaphore so only one song will play at a time
-6. Figuring out pausing or skipping a song on a playlist
+1. Constructing a linked list based on actual mp3 files (reworking myTunes) - Claire
+2. Seeking mp3 files in a given directory - Angelique
+3. Figuring out how to get data like artist and album from an mp3 file - Lauren
+4. Creating playlists from a user input using shared memory - Claire
+5. Implementing a semaphore so only one song will play at a time - Angelique
+6. Figuring out pausing or skipping a song on a playlist - Lauren
+Depending on how long each step takes we will probably collaborate on some steps.
 
 What data structures you will be using and how.
   - structs as in the myTunes Project
