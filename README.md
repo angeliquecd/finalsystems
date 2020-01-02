@@ -26,7 +26,8 @@ How you are breaking down the project and who is responsible for which parts.
 Depending on how long each step takes we will probably collaborate on some steps.
 
 What data structures you will be using and how.
-  - structs as in the myTunes Project\
+  - structs as in the myTunes Project
+
 What algorithms and /or data structures you will be using, and how.
   - we will be looking for a library that can be used to play audio from a file (last year I found a comparable library in Java to play a constructed song)
 
