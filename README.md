@@ -6,7 +6,7 @@ A statement of the problem you are solving and/or a high level description of th
 Our project will handle music files. It will access the user's files, search for music type/mp3 files, and organize playlists based on artist, album and genre. The user will be able to edit their library by deleting artists, albums or songs, by shuffling or by creating their own playlists that  are saved onto the computer. The user will also be able to play song files, one at a time. We're also going to try to implement features such as pausing a song or skipping a song on the playlist.
 
 A description as to how the project will be used (describe the user interface).\
-The interface will be text based, asking for a directory of songs, and then asking for an artist, album, or genre to make a playlist for.
+The interface will be text based, asking for a directory of songs, and then asking for an artist, album, or genre to make a playlist for. The user can then input when to pause or skip a song. 
 
 A description of your technical design. This should include:
 How you will be using the topics covered in class in the project.
