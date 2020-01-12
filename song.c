@@ -1,13 +1,113 @@
-struct song_node {
-  char song_name[100];
-  char artist[100];
-  char album_name[100];
-  char path[150];
-  int genre;
-  struct song_node *next;
-};
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <dirent.h>
+#include <sys/wait.h>
+#include "song.h"
 
-struct song_node * newSong(char artisty[],char songy[],char albumy[],char pathy[],int genrey);
-void print_list(struct song_node * myNode);
-void print_song(struct song_node * myNode);
-void enter_song_data(struct song_node * myNode) ;
+struct song_node * initSong(char pathp[]) {
+  struct song_node * new = malloc(sizeof(struct song_node));
+  strncpy(new->path, pathp, 150);
+  return new;
+}
+
+struct song_node * populate_songs() {
+    struct song_node * song;
+    char * dirname = "songs/";
+    DIR * dir = malloc(sizeof(DIR *));
+    dir = opendir(dirname);
+    if (!dir) {
+      printf("Directory invalid\n");
+      return 0;
+    } else printf("Success opening directory!\n");
+    printf("Searching songs/ ... \n");
+    struct dirent * cur = readdir(dir);
+
+    struct stat * info; //var to store status of each file
+    char fpath[100]; //stores file path
+    //make names into arrays to use with strcpy
+    while (cur != NULL) {
+      //info = malloc(sizeof(struct stat));
+      //check that entry is not a directory
+      if (cur->d_type != DT_DIR) {
+        strcpy(fpath, cur->d_name);
+        printf("file: %s\n", fpath);
+        song = initSong(fpath);
+        enter_song_data(song);
+        printf("artist: %s | name: %s\n\n", song->artist, song->song_name);
+
+      }
+      cur = readdir(dir);
+    }
+    return song;
+  }
+
+struct song_node * newSong(char artisty[],char songy[],char albumy[],char pathy[],int genrey){
+  struct song_node *new = malloc(sizeof(struct song_node));
+  strncpy(new->artist, artisty, 100);
+  strncpy(new->song_name,songy,100);
+  strncpy(new->album_name, albumy, 100);
+  strncpy(new->path, pathy, 100);
+  new->genre = genrey;
+  new->next = NULL;
+  return new;
+}
+
+void print_song(struct song_node * myNode){
+  printf(" %s: %s (%s)\n",myNode->artist,myNode->song_name,myNode->album_name);
+}
+
+void print_list(struct song_node * myNode) {
+  //make new node copy, so as not to modify original pointer.
+  struct song_node * newNode = myNode;
+  //if current node is null, print nothing!
+  if (newNode == NULL) {
+    printf("{}\n");
+    return;
+  }
+  //if it's not null:
+  //loop which stops once there is no next node.
+  while (newNode->next != NULL) {
+    printf(" %s: %s |",newNode->artist,newNode->song_name);
+    newNode = newNode->next;
+  }
+  printf(" %s: %s",newNode->artist, newNode->song_name);
+  //there is no next node, but still need to print current (last) node:
+  //printf(" %s: %s ",newNode->artist,newNode->name);
+  printf("\n");
+  //nvm if there is no next
+  //printf("]");
+  return;
+}
+
+//prompts user to enter data for a song, fills in this data to struct
+void enter_song_data(struct song_node * myNode) {
+  char input[100];
+  char * sep; // used for strsep
+  //get song Name
+  printf("Enter song name: ");
+  fgets(input, 100, stdin);
+  //strncpy(input, strsep(&strncpy(sep, input, 100), "\n")); <- was trying to get rid of the /n after the input
+  strncpy(myNode->song_name, input, 100);
+
+  //get artist
+  printf("Enter artist name: ");
+  fgets(input, 100, stdin);
+  // strncpy(sep, input, 100);
+  // sep = strsep(&sep, "\n");
+  // strncpy(input, sep, 100); <- trying to get rid of \n
+  strncpy(myNode->artist, input, 100);
+
+}
+
+int main() {
+  populate_songs();
+  return 0;
+}
