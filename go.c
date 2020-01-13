@@ -35,9 +35,10 @@ int main(int argc, char *argsv[]){
     if (cur->d_type != DT_DIR) {
         shmd=shmget(1232+i,SEG_SIZE, IPC_CREAT | 0644);
         printf("Id created: %d",shmd);
+        printf("I is: %d",i);
+          i++;
     }
     cur = readdir(dir);
-    i++;
 }
   if (shmd<0) printf("Error opening shared memory.");
   printf("Welcome to the music center! How would you like to proceed?\n");
@@ -83,7 +84,8 @@ if (strcmp(s,"POPULATE\n")==0){
 }
 if (strcmp(s,"BROWSE\n")==0){
    i =0;
-  shmd=shmget(1232+i,1,0);
+  shmd=shmget(1232+i,SEG_SIZE,0);
+  if (shmd<0) printf("Error with browse. %d",errno);
   //printf("Did that");
   data=( struct song_node *) shmat(shmd,0,0);
 //  printf("%p or %d",data,shmd);
@@ -97,7 +99,7 @@ if (strcmp(s,"CREATE")==0){
   //i think we agreed that playlists are text files w a list of song addresses
 }
 if (strcmp(s,"DELETE")==0){
-  shmd=shmget(KEY2,1,0);
+  shmd=shmget(KEY2,SEG_SIZE,0);
   q=shmctl(shmd,IPC_RMID,0);
 }
 shmdt(data);

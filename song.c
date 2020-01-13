@@ -17,7 +17,7 @@
 struct song_node * initSong(char pathp[],int i) {
   int shmd;
   struct song_node *data;
-  shmd=shmget(1232+i,1,0);
+  shmd=shmget(1232+i,SEG_SIZE,0);
 //  printf("Got here.");
     if (shmd<0) printf("Error opening shared memory.");
   data=(struct song_node *) shmat(shmd,0,0);
@@ -57,16 +57,16 @@ int times=0;
         enter_song_data(song);
         printf("artist: %s | name: %s\n\n", song->artist, song->song_name);
 //times++;
+  i++;
       }
       cur = readdir(dir);
-      i++;
   //  }
   }
   // //  printf("After populate: %s, %s, %s",song->path,song->artist,song->song_name);
-  //   shmd=shmget(KEY2,1,0);
-  //   data=(struct song_node *) shmat(shmd,0,0);
+     shmd=shmget(KEY2,SEG_SIZE,0);
+     data=(struct song_node *) shmat(shmd,0,0);
   //  printf("%p vs. %p",song, data);
-        shmdt(song);
+    shmdt(song);
     return song;
   }
 
