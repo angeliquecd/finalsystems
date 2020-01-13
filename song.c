@@ -11,16 +11,26 @@
 #include <dirent.h>
 #include <sys/wait.h>
 #include "song.h"
-
-struct song_node * initSong(char pathp[]) {
-  struct song_node * new = malloc(sizeof(struct song_node));
-  strncpy(new->path, pathp, 150);
-  return new;
+#define KEY 10001
+#define KEY2 1232
+#define SEG_SIZE sizeof(struct song_node)
+struct song_node * initSong(char pathp[],int i) {
+  int shmd;
+  struct song_node *data;
+  shmd=shmget(KEY2,1,0);
+    if (shmd<0) printf("Error opening shared memory.");
+  data=(struct song_node *) shmat(shmd,0,0);
+  strncpy(data->path, pathp, 150);
+//  printf("THis is in init: %s",data->path);
+  return data;
 }
 
 struct song_node * populate_songs() {
     struct song_node * song;
+    int shmd;
+    struct song_node *data;
     char * dirname = "songs/";
+    int i=0;
     DIR * dir = malloc(sizeof(DIR *));
     dir = opendir(dirname);
     if (!dir) {
@@ -29,23 +39,30 @@ struct song_node * populate_songs() {
     } else printf("Success opening directory!\n");
     printf("Searching songs/ ... \n");
     struct dirent * cur = readdir(dir);
-
+int times=0;
     struct stat * info; //var to store status of each file
     char fpath[100]; //stores file path
     //make names into arrays to use with strcpy
-    while (cur != NULL) {
+    while (cur != NULL && times<1) {
       //info = malloc(sizeof(struct stat));
       //check that entry is not a directory
       if (cur->d_type != DT_DIR) {
         strcpy(fpath, cur->d_name);
         printf("file: %s\n", fpath);
-        song = initSong(fpath);
+        song = initSong(fpath,i);
+      //  printf("In populate: %s",song->path);
         enter_song_data(song);
         printf("artist: %s | name: %s\n\n", song->artist, song->song_name);
-
+times++;
       }
       cur = readdir(dir);
+      i++;
     }
+  //  printf("After populate: %s, %s, %s",song->path,song->artist,song->song_name);
+    shmd=shmget(KEY2,1,0);
+    data=(struct song_node *) shmat(shmd,0,0);
+  //  printf("%p vs. %p",song, data);
+        shmdt(song);
     return song;
   }
 
@@ -86,28 +103,24 @@ void print_list(struct song_node * myNode) {
   //printf("]");
   return;
 }
-
 //prompts user to enter data for a song, fills in this data to struct
 void enter_song_data(struct song_node * myNode) {
   char input[100];
   char * sep; // used for strsep
   //get song Name
   printf("Enter song name: ");
-  fgets(input, 100, stdin);
+  fgets(myNode->song_name, 100, stdin);
   //strncpy(input, strsep(&strncpy(sep, input, 100), "\n")); <- was trying to get rid of the /n after the input
-  strncpy(myNode->song_name, input, 100);
 
   //get artist
   printf("Enter artist name: ");
-  fgets(input, 100, stdin);
+  fgets(myNode->artist, 100, stdin);
   // strncpy(sep, input, 100);
   // sep = strsep(&sep, "\n");
   // strncpy(input, sep, 100); <- trying to get rid of \n
-  strncpy(myNode->artist, input, 100);
-
 }
 
-int main() {
-  populate_songs();
-  return 0;
-}
+// int main() {
+//   populate_songs();
+//   return 0;
+// }
