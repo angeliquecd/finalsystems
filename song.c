@@ -17,11 +17,13 @@
 struct song_node * initSong(char pathp[],int i) {
   int shmd;
   struct song_node *data;
-  shmd=shmget(KEY2,1,0);
+  shmd=shmget(1232+i,1,0);
+//  printf("Got here.");
     if (shmd<0) printf("Error opening shared memory.");
   data=(struct song_node *) shmat(shmd,0,0);
-  strncpy(data->path, pathp, 150);
-//  printf("THis is in init: %s",data->path);
+  printf("The id is: %d",shmd);
+  strncpy(data->path, pathp, 150);//puts path onto shared memory pieces
+//  printf("This is in init: %s",data->path);
   return data;
 }
 
@@ -43,7 +45,8 @@ int times=0;
     struct stat * info; //var to store status of each file
     char fpath[100]; //stores file path
     //make names into arrays to use with strcpy
-    while (cur != NULL && times<1) {
+    while (cur != NULL) {
+    //  while(times<1){
       //info = malloc(sizeof(struct stat));
       //check that entry is not a directory
       if (cur->d_type != DT_DIR) {
@@ -53,14 +56,15 @@ int times=0;
       //  printf("In populate: %s",song->path);
         enter_song_data(song);
         printf("artist: %s | name: %s\n\n", song->artist, song->song_name);
-times++;
+//times++;
       }
       cur = readdir(dir);
       i++;
-    }
-  //  printf("After populate: %s, %s, %s",song->path,song->artist,song->song_name);
-    shmd=shmget(KEY2,1,0);
-    data=(struct song_node *) shmat(shmd,0,0);
+  //  }
+  }
+  // //  printf("After populate: %s, %s, %s",song->path,song->artist,song->song_name);
+  //   shmd=shmget(KEY2,1,0);
+  //   data=(struct song_node *) shmat(shmd,0,0);
   //  printf("%p vs. %p",song, data);
         shmdt(song);
     return song;
