@@ -33,9 +33,9 @@ int main(int argc, char *argsv[]){
   struct dirent * cur = readdir(dir);
   while (cur != NULL) {
     if (cur->d_type != DT_DIR) {
-        shmd=shmget(1232+i,SEG_SIZE, IPC_CREAT | 0644);
-        printf("Id created: %d",shmd);
-        printf("I is: %d",i);
+        shmd=shmget(KEY2+i,SEG_SIZE, IPC_CREAT | 0644);
+      //  printf("Id created: %d\n",shmd);
+    //    printf("I is: %d\n",i);
           i++;
     }
     cur = readdir(dir);
@@ -49,7 +49,7 @@ int main(int argc, char *argsv[]){
   printf("Type BROWSE to browse the library\n");
       //type artist, song title, album
   printf("Type ADD to add a song to your library\n");
-  printf("Type DELETE to delete the library and free up space on your harddrive");
+  printf("Type DELETE to delete the library and free up space on your harddrive\n");
     printf("Type EXIT to exit the program\n");
   printf("Enter your selection: ");
   fgets(s,100,stdin);
@@ -77,22 +77,22 @@ if (strcmp(s,"POPULATE\n")==0){
   // shmd=shmget(KEY2,1,0);
   //   data=( struct song_node *) shmat(shmd,0,0);
   // printf("%p or %d",data,shmd);
-  populate_songs();
+  populate_songs(i);
   //prints library
   //this is where you can search for, delete songs
   //add songs?
 }
 if (strcmp(s,"BROWSE\n")==0){
-   i =0;
-  shmd=shmget(1232+i,SEG_SIZE,0);
+   int a =0;
+  shmd=shmget(KEY2+a,SEG_SIZE,0);
   if (shmd<0) printf("Error with browse. %d",errno);
   //printf("Did that");
   data=( struct song_node *) shmat(shmd,0,0);
 //  printf("%p or %d",data,shmd);
 printf("Song library: \n");
-printf("The id is: %d",shmd);
-  print_song(data);
-  //print_list(data);
+//printf("The id is: %d",shmd);
+  //print_song(data);
+  print_list(data);
 }
 if (strcmp(s,"CREATE")==0){
   //makes a lil shell where you can write to playlists
