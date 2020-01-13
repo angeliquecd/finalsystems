@@ -20,18 +20,35 @@
 //this is what executes at runtime
 int main(int argc, char *argsv[]){
   int shmd, q;
+  int i=0;
   char s[100];
   struct song_node *data;
-  shmd=shmget(KEY2,SEG_SIZE, IPC_CREAT | 0644);
+  char * dirname = "songs/";
+  DIR * dir = malloc(sizeof(DIR *));
+  dir = opendir(dirname);
+  if (!dir) {
+    printf("Directory invalid\n");
+    return 0;
+  }
+  struct dirent * cur = readdir(dir);
+  while (cur != NULL) {
+    if (cur->d_type != DT_DIR) {
+        shmd=shmget(1232+i,SEG_SIZE, IPC_CREAT | 0644);
+        printf("Id created: %d",shmd);
+    }
+    cur = readdir(dir);
+    i++;
+}
   if (shmd<0) printf("Error opening shared memory.");
   printf("Welcome to the music center! How would you like to proceed?\n");
     while (strcmp(s,"EXIT\n")!=0){
-  printf("Type PLAY to play music\n");
   printf("Type POPULATE to populate the library\n");//temporary button
+  printf("Type PLAY to play music\n");
   printf("Type CREATE to create a new playlist\n");
   printf("Type BROWSE to browse the library\n");
       //type artist, song title, album
   printf("Type ADD to add a song to your library\n");
+  printf("Type DELETE to delete the library and free up space on your harddrive");
     printf("Type EXIT to exit the program\n");
   printf("Enter your selection: ");
   fgets(s,100,stdin);
@@ -55,24 +72,23 @@ if (strcmp(s,"PLAY\n")==0){
 if (strcmp(s,"POPULATE\n")==0){
   //printf("Song library: ");
   // struct song_node *hello =initSong("hell0",0);
-  // printf("%s",hello->path);
-  shmd=shmget(KEY2,1,0);
-    data=( struct song_node *) shmat(shmd,0,0);
-  printf("%p or %d",data,shmd);
+  // // printf("%s",hello->path);
+  // shmd=shmget(KEY2,1,0);
+  //   data=( struct song_node *) shmat(shmd,0,0);
+  // printf("%p or %d",data,shmd);
   populate_songs();
-  //printf("This: [%s]",data->song_name);
-  //printf("This: [%s]",data->path);
   //prints library
   //this is where you can search for, delete songs
   //add songs?
 }
 if (strcmp(s,"BROWSE\n")==0){
-  shmd=shmget(KEY2,1,0);
-  int a;
+   i =0;
+  shmd=shmget(1232+i,1,0);
   //printf("Did that");
   data=( struct song_node *) shmat(shmd,0,0);
 //  printf("%p or %d",data,shmd);
 printf("Song library: \n");
+printf("The id is: %d",shmd);
   print_song(data);
   //print_list(data);
 }
@@ -80,9 +96,11 @@ if (strcmp(s,"CREATE")==0){
   //makes a lil shell where you can write to playlists
   //i think we agreed that playlists are text files w a list of song addresses
 }
+if (strcmp(s,"DELETE")==0){
+  shmd=shmget(KEY2,1,0);
+  q=shmctl(shmd,IPC_RMID,0);
+}
 shmdt(data);
 }
 printf("Exiting the program.\n");
-shmd=shmget(KEY2,1,0);
-q=shmctl(shmd,IPC_RMID,0);
 }
