@@ -81,7 +81,8 @@ struct song_node * newSong(char artisty[],char songy[],char albumy[],char pathy[
   return new;
 }
 
-void print_song(struct song_node * myNode){
+void print_song(struct song_node * myNode
+ ){
   printf(" %s: %s (%s)\n",myNode->artist,myNode->song_name,myNode->album_name);
 }
 
@@ -113,12 +114,16 @@ void enter_song_data(struct song_node * myNode) {
   char * sep; // used for strsep
   //get song Name
   printf("Enter song name: ");
-  fgets(myNode->song_name, 100, stdin);
+  fgets(input, 100, stdin);
   //strncpy(input, strsep(&strncpy(sep, input, 100), "\n")); <- was trying to get rid of the /n after the input
+  sep = &input[0];
+  strncpy(myNode->song_name, strsep(&sep, "\n"), 100);
 
   //get artist
   printf("Enter artist name: ");
   fgets(myNode->artist, 100, stdin);
+  sep = &input[0];
+  strncpy(myNode->artist, strsep(&sep, "\n"), 100);
   // strncpy(sep, input, 100);
   // sep = strsep(&sep, "\n");
   // strncpy(input, sep, 100); <- trying to get rid of \n
