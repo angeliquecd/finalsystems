@@ -13,3 +13,7 @@ void print_song(struct song_node * myNode);
 void enter_song_data(struct song_node * myNode) ;
 struct song_node * populate_songs(int num);
 struct song_node * initSong(char pathp[],int i,int max);
+struct genre_index{
+  int num;
+  char name[];
+}
