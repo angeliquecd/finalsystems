@@ -100,10 +100,10 @@ void print_list(struct song_node * myNode) {
   //if it's not null:
   //loop which stops once there is no next node.
   while (newNode->next != 0) {
-    printf(" %s: %s |",newNode->artist,newNode->song_name);
+    printf(" %s: %s (%s), genre %d \n",newNode->artist,newNode->song_name,newNode->album_name,newNode->genre);
       newNode=(struct song_node *) shmat(newNode->next,0,0);
   }
-  printf(" %s: %s",newNode->artist, newNode->song_name);
+  printf(" %s: %s (%s), genre %d \n", newNode->artist,newNode->song_name,newNode->album_name,newNode->genre);
   //there is no next node, but still need to print current (last) node:
   //printf(" %s: %s ",newNode->artist,newNode->name);
   printf("\n");
