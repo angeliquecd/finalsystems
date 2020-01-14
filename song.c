@@ -85,7 +85,7 @@ struct song_node * newSong(char artisty[],char songy[],char albumy[],char pathy[
 }
 
 void print_song(struct song_node * myNode){
-  printf(" %s: %s (%s)\n",myNode->artist,myNode->song_name,myNode->album_name);
+  printf(" %s: %s (%s), genre %d \n",myNode->artist,myNode->song_name,myNode->album_name,myNode->genre);
 }
 
 void print_list(struct song_node * myNode) {
@@ -141,7 +141,7 @@ void enter_song_data(struct song_node * myNode) {
   int g;
   sscanf(sep, "%d", &g);
   myNode->genre = g;
-  
+
   // strncpy(sep, input, 100);
   // sep = strsep(&sep, "\n");
   // strncpy(input, sep, 100); <- trying to get rid of \n
