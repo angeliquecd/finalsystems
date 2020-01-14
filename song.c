@@ -61,7 +61,7 @@ int times=0;
         song = initSong(fpath,i,num);
       //  printf("In populate: %s",song->path);
         enter_song_data(song);
-        printf("artist: %s | name: %s\n\n", song->artist, song->song_name);
+        printf("name: %s | artist: %s\n\n", song->song_name, song->artist);
 //times++;
   i++;
       }
