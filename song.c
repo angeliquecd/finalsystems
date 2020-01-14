@@ -124,7 +124,7 @@ void enter_song_data(struct song_node * myNode) {
 
   //get artist
   printf("Enter artist name: ");
-  fgets(myNode->artist, 100, stdin);
+  fgets(input, 100, stdin);
   sep = &input[0];
   strncpy(myNode->artist, strsep(&sep, "\n"), 100);
   // strncpy(sep, input, 100);

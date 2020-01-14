@@ -18,11 +18,9 @@
 
 #define SEG_SIZE sizeof(struct song_node)
 //this is what executes at runtime
-int main(int argc, char *argsv[]){
-  int shmd, q;
+int initmem(){
   int i=0;
-  char s[100];
-  struct song_node *data;
+  int shmd;
   char * dirname = "songs/";
   DIR * dir = malloc(sizeof(DIR *));
   dir = opendir(dirname);
@@ -39,10 +37,18 @@ int main(int argc, char *argsv[]){
           i++;
     }
     cur = readdir(dir);
+  }
+  return i;
 }
-  if (shmd<0) printf("Error opening shared memory.");
+int main(int argc, char *argsv[]){
+  int shmd, q;
+  int i=0;
+  char s[100];
+  char * sep;
+  struct song_node *data;
+i=initmem();
   printf("Welcome to the music center! How would you like to proceed?\n");
-    while (strcmp(s,"EXIT\n")!=0){
+    while (strcmp(s,"EXIT")!=0){
   printf("Type POPULATE to populate the library\n");//temporary button
   printf("Type PLAY to play music\n");
   printf("Type CREATE to create a new playlist\n");
@@ -52,15 +58,42 @@ int main(int argc, char *argsv[]){
   printf("Type DELETE to delete the library and free up space on your harddrive\n");
     printf("Type EXIT to exit the program\n");
   printf("Enter your selection: ");
+
   fgets(s,100,stdin);
-  printf("You chose: %s\n",s);
-if (strcmp(s,"PLAY\n")==0){
-  printf("Type the name of the song, artist, playlist or album you'd like to listen to:");
-  char * a;
-  //i think we can take out the possibility of songs w the same name as the album and artists w the same name as the song
-  fgets(a,100,stdin);
-  strsep(&a,"\n");
-  printf("%s",s);
+  sep = &s[0];
+  printf("You chose: %s",strsep(&sep,"\n"));
+// if (strcmp(s,"PLAY")==0){
+//   printf("\nWould you like to play a song, album, artist or playlist?\n");
+//   //i think we can take out the possibility of songs w the same name as the album and artists w the same name as the song
+//   fgets(s,100,stdin);
+//   strsep(&sep,"\n");
+//   printf("You chose: %s\n",s);
+//   if (strcmp(s,SONG)==0){
+//     printf("Type the name and artist of the song you would like to play.\n");
+//     char * path;
+//     char * song;
+//     fgets(song,100, stdin);
+//   //  path= searchsongs(song); //will return the path, null if there is no such song
+//   // if path!=NULL then
+//   f=fork();
+//   if (f){
+//     wait(&status);
+//   }
+//   else{
+//     char * commands[];
+//     comands[0]="play"
+//     commands[1]=path
+//     execvp("play","")
+//   }
+//   }
+//   shmd=shmget(KEY2,SEG_SIZE,0);
+//   printf("You ")
+//   //printf("Did that");
+//   data=( struct song_node *) shmat(shmd,0,0);
+//   findsong();
+//   fork();{
+
+
   //searches songs
 //  if song name matches it plays and that's that
     //if song has album name in id it plays and album mode is set, same for artist
@@ -69,8 +102,8 @@ if (strcmp(s,"PLAY\n")==0){
   //if album mode is set, after first song plays it seeks out the next song with that album in its id etc
   //same with artist mode
   //
-  }
-if (strcmp(s,"POPULATE\n")==0){
+  //}
+if (strcmp(s,"POPULATE")==0){
   //printf("Song library: ");
   // struct song_node *hello =initSong("hell0",0);
   // // printf("%s",hello->path);
@@ -82,7 +115,7 @@ if (strcmp(s,"POPULATE\n")==0){
   //this is where you can search for, delete songs
   //add songs?
 }
-if (strcmp(s,"BROWSE\n")==0){
+if (strcmp(s,"BROWSE")==0){
    int a =0;
   shmd=shmget(KEY2+a,SEG_SIZE,0);
   if (shmd<0) printf("Error with browse. %d",errno);
@@ -104,5 +137,5 @@ if (strcmp(s,"DELETE")==0){
 }
 shmdt(data);
 }
-printf("Exiting the program.\n");
+printf("\nExiting the program.\n");
 }
