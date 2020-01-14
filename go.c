@@ -40,6 +40,7 @@ int initmem(){
   }
   return i;
 }
+
 int main(int argc, char *argsv[]){
   int shmd, q;
   int i=0;
@@ -55,54 +56,49 @@ i=initmem();
   printf("Type BROWSE to browse the library\n");
       //type artist, song title, album
   printf("Type ADD to add a song to your library\n");
-  printf("Type DELETE to delete the library and free up space on your harddrive\n");
-    printf("Type EXIT to exit the program\n");
+  printf("Type DELETE to delete the library\n");
+  printf("Type EXIT to exit the program\n");
   printf("Enter your selection: ");
 
   fgets(s,100,stdin);
   sep = &s[0];
   printf("You chose: %s\n",strsep(&sep,"\n"));
-// if (strcmp(s,"PLAY")==0){
-//   printf("\nWould you like to play a song, album, artist or playlist?\n");
-//   //i think we can take out the possibility of songs w the same name as the album and artists w the same name as the song
-//   fgets(s,100,stdin);
-//   strsep(&sep,"\n");
-//   printf("You chose: %s\n",s);
-//   if (strcmp(s,SONG)==0){
-//     printf("Type the name and artist of the song you would like to play.\n");
-//     char * path;
-//     char * song;
-//     fgets(song,100, stdin);
-//   //  path= searchsongs(song); //will return the path, null if there is no such song
-//   // if path!=NULL then
-//   f=fork();
-//   if (f){
-//     wait(&status);
-//   }
-//   else{
-//     char * commands[];
-//     comands[0]="play"
-//     commands[1]=path
-//     execvp("play","")
-//   }
-//   }
-//   shmd=shmget(KEY2,SEG_SIZE,0);
-//   printf("You ")
-//   //printf("Did that");
-//   data=( struct song_node *) shmat(shmd,0,0);
-//   findsong();
-//   fork();{
+if (strcmp(s,"PLAY")==0){
+  printf("\nWould you like to play a song, genre, album, artist or playlist?\n");
+  //i think we can take out the possibility of songs w the same name as the album and artists w the same name as the song
+  fgets(s,100,stdin);
+  strsep(&sep,"\n");
+  printf("You chose: %s\n",s);
+  // if (strcmp(s,"SONG")==0){
+  //   printf("Type the name and artist of the song you would like to play.\n");
+  //   char * path;
+  //   char * song;
+  //   fgets(song,100, stdin);
+  // //  path= searchsongs(song); //will return the path, null if there is no such song
+  // // if path!=NULL then
+  // f=fork();
+  // if (f){
+  //   wait(&status);
+  // }
+  // else{
+  //   char * commands[];
+  //   comands[0]="play";
+  //   commands[1]=path;
+  //   execvp("play",commands);
+  // }
+  // }
+if (strcmp(s,"PLAYLIST")==0){
 
+}
+if (strcmp(s,"ALBUM")==0){
 
-  //searches songs
-//  if song name matches it plays and that's that
-    //if song has album name in id it plays and album mode is set, same for artist
-//searches playlists
-  //if it finds playlist name, does a for or while loop of songs in the playlist
-  //if album mode is set, after first song plays it seeks out the next song with that album in its id etc
-  //same with artist mode
-  //
-  //}
+}
+if (strcmp(s,"GENRE")==0){
+
+}
+if (strcmp(s,"ARTIST")==0){
+  }
+}
 if (strcmp(s,"POPULATE")==0){
   //printf("Song library: ");
   // struct song_node *hello =initSong("hell0",0);

@@ -135,13 +135,15 @@ void enter_song_data(struct song_node * myNode) {
   strncpy(myNode->album_name, strsep(&sep, "\n"), 100);
 
   //get genre
-  printf("Enter genre number: ");
+  printf("Enter genre number:\n");
+  printf("0: Blues\n 1: Rock \n 2: Country\n 3: Dance\n4: Hip-hop\n5: Funk\n6: Jazz\n7: Pop\n");
+  printf("8: Metal\n9: Oldies\n10:Rhythm and Blues \n11: Rap\n 12: Classical\n 13: Reggae\n14: Indie\n15: Other\n");
   fgets(input, 100, stdin);
   sep = &input[0];
   int g;
   sscanf(sep, "%d", &g);
   myNode->genre = g;
-  
+
   // strncpy(sep, input, 100);
   // sep = strsep(&sep, "\n");
   // strncpy(input, sep, 100); <- trying to get rid of \n
