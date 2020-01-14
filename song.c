@@ -127,6 +127,21 @@ void enter_song_data(struct song_node * myNode) {
   fgets(input, 100, stdin);
   sep = &input[0];
   strncpy(myNode->artist, strsep(&sep, "\n"), 100);
+
+  //get album
+  printf("Enter album name: ");
+  fgets(input, 100, stdin);
+  sep = &input[0];
+  strncpy(myNode->album_name, strsep(&sep, "\n"), 100);
+
+  //get genre
+  printf("Enter genre number: ");
+  fgets(input, 100, stdin);
+  sep = &input[0];
+  int g;
+  sscanf(sep, "%d", &g);
+  myNode->genre = g;
+
   // strncpy(sep, input, 100);
   // sep = strsep(&sep, "\n");
   // strncpy(input, sep, 100); <- trying to get rid of \n
