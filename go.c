@@ -61,7 +61,7 @@ i=initmem();
 
   fgets(s,100,stdin);
   sep = &s[0];
-  printf("You chose: %s",strsep(&sep,"\n"));
+  printf("You chose: %s\n",strsep(&sep,"\n"));
 // if (strcmp(s,"PLAY")==0){
 //   printf("\nWould you like to play a song, album, artist or playlist?\n");
 //   //i think we can take out the possibility of songs w the same name as the album and artists w the same name as the song
@@ -132,8 +132,12 @@ if (strcmp(s,"CREATE")==0){
   //i think we agreed that playlists are text files w a list of song addresses
 }
 if (strcmp(s,"DELETE")==0){
-  shmd=shmget(KEY2,SEG_SIZE,0);
+  int a;
+  for ( a=0;a<i;a++){
+  shmd=shmget(KEY2+a,SEG_SIZE,0);
   q=shmctl(shmd,IPC_RMID,0);
+}
+printf("Library deleted.");
 }
 shmdt(data);
 }
