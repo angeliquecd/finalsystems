@@ -13,6 +13,7 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+// #include "songLibrary.c"
 #include "song.c"
 #define KEY2 1232
 
@@ -77,22 +78,34 @@ if (strcmp(s,"POPULATE\n")==0){
   // shmd=shmget(KEY2,1,0);
   //   data=( struct song_node *) shmat(shmd,0,0);
   // printf("%p or %d",data,shmd);
+  initialize_table();
   populate_songs(i);
+  int c=0;
+  printf("artist array shmds: ");
+  while (artists[c]){
+    printf("%d,  ", artists[c]);
+    c++;
+  }
+  printf("\n");
   //prints library
   //this is where you can search for, delete songs
   //add songs?
 }
 if (strcmp(s,"BROWSE\n")==0){
-   int a =0;
-  shmd=shmget(KEY2+a,SEG_SIZE,0);
-  if (shmd<0) printf("Error with browse. %d",errno);
-  //printf("Did that");
-  data=( struct song_node *) shmat(shmd,0,0);
+  //  int a =0;
+  // shmd=shmget(KEY2+a,SEG_SIZE,0);
+  // if (shmd<0) printf("Error with browse. %d",errno);
+  // //printf("Did that");
+  // data=( struct song_node *) shmat(shmd,0,0);
 //  printf("%p or %d",data,shmd);
 printf("Song library: \n");
+//printf("%d\n", artists[0]);
+struct song_node * test = shmat(65537, 0, 0);
+print_song(test);
+print_library();
 //printf("The id is: %d",shmd);
   //print_song(data);
-  print_list(data);
+  //print_list(data);
 }
 if (strcmp(s,"CREATE")==0){
   //makes a lil shell where you can write to playlists
