@@ -108,7 +108,7 @@ int print_song_shmd(int shmd ) {
 //prints each artist bucket (start w first shmd)
 void print_list(int shmd) {
   //make new node copy, so as not to modify original pointer.
-  // struct song_node * newNode = shmat(shmd, 0, 0);
+  struct song_node * newNode = shmat(shmd, 0, 0);
 
   //if current node is null, print nothing!
   if (shmd == 0) {
@@ -117,19 +117,16 @@ void print_list(int shmd) {
   }
   //if it's not null:
   //loop which stops once there is no next node.
-<<<<<<< HEAD
   while (shmd) {
     printf("shmd:%d\n", shmd);
     shmd = print_song_shmd(shmd);
     printf("next song in bucket...\n");
   }
-=======
   while (newNode->next != 0) {
     printf(" %s: %s (%s), genre %d \n",newNode->artist,newNode->song_name,newNode->album_name,newNode->genre);
       newNode=(struct song_node *) shmat(newNode->next,0,0);
   }
   printf(" %s: %s (%s), genre %d \n", newNode->artist,newNode->song_name,newNode->album_name,newNode->genre);
->>>>>>> 7f535b8f56689e1a0bcd334b148df777f0b47333
   //there is no next node, but still need to print current (last) node:
   //printf(" %s: %s ",newNode->artist,newNode->name);
   printf("\n");
@@ -168,17 +165,11 @@ void enter_song_data(int shmd) {
   sep = &input[0];
   strncpy(myNode->artist, strsep(&sep, "\n"), 100);
 
-<<<<<<< HEAD
-  //get album info
-=======
   //get album
->>>>>>> 7f535b8f56689e1a0bcd334b148df777f0b47333
   printf("Enter album name: ");
   fgets(input, 100, stdin);
   sep = &input[0];
   strncpy(myNode->album_name, strsep(&sep, "\n"), 100);
-<<<<<<< HEAD
-=======
 
   //get genre
   printf("Enter genre number:\n");
@@ -190,7 +181,6 @@ void enter_song_data(int shmd) {
   sscanf(sep, "%d", &g);
   myNode->genre = g;
 
->>>>>>> 7f535b8f56689e1a0bcd334b148df777f0b47333
   // strncpy(sep, input, 100);
   // sep = strsep(&sep, "\n");
   // strncpy(input, sep, 100); <- trying to get rid of \n
