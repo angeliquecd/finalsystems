@@ -14,26 +14,33 @@
 #define KEY 10001
 #define KEY2 1232
 #define SEG_SIZE sizeof(struct song_node)
-struct song_node * initSong(char pathp[],int i,int max) {
+
+int initSong(char pathp[],int i,int max) {
   int shmd, nextshmd;
   struct song_node *data;
-  struct song_node *datanext;
+
   shmd=shmget(KEY2+i,SEG_SIZE,0);
 //  printf("Got here.");
     if (shmd<0) printf("Error opening shared memory.");
+
   data=(struct song_node *) shmat(shmd,0,0);
+  data->next = 0;
 //  printf("The id is: %d\n",shmd);
-if (max-i>1){
-  nextshmd=shmget(KEY2+1+i,SEG_SIZE,0);
-  data->next= nextshmd;}
-  else data->next = 0;
-  strncpy(data->path, pathp, 150);//puts path onto shared memory pieces
-//    printf("%s and %d", data->path,data->next);
-//  printf("This is in init: %s",data->path);
-  return data;
+// if (max-i>1){
+//   nextshmd=shmget(KEY2+1+i,SEG_SIZE,0);
+//   data->next= nextshmd;
+//
+//
+// }
+//   else data->next = 0;
+//   strncpy(data->path, pathp, 150);//puts path onto shared memory pieces
+// //    printf("%s and %d", data->path,data->next);
+// //  printf("This is in init: %s",data->path);
+  return shmd;
 }
 
 struct song_node * populate_songs(int num) {
+  printf("# songs found: %d\n", num);
     struct song_node * song;
     int shmd;
     struct song_node *data;
@@ -58,10 +65,13 @@ int times=0;
       if (cur->d_type != DT_DIR) {
         strcpy(fpath, cur->d_name);
         printf("file: %s\n", fpath);
-        song = initSong(fpath,i,num);
-      //  printf("In populate: %s",song->path);
-        enter_song_data(song);
-        printf("artist: %s | name: %s\n\n", song->artist, song->song_name);
+        printf("i: %d\n", i);
+        shmd = initSong(fpath,i,num);
+        printf("shmd: %d initialized.\n", shmd);
+      //  printf("In populate: %s",s  ong->path);
+        enter_song_data(shmd);
+        add_song(shmd);
+
 //times++;
   i++;
       }
@@ -69,7 +79,8 @@ int times=0;
   //  }
   }
   //  printf("%p vs. %p",song, data);
-    shmdt(song);
+    // shmdt(song);
+
     return song;
   }
 
@@ -88,22 +99,29 @@ void print_song(struct song_node * myNode){
   printf(" %s: %s (%s)\n",myNode->artist,myNode->song_name,myNode->album_name);
 }
 
-void print_list(struct song_node * myNode) {
+int print_song_shmd(int shmd ) {
+  struct song_node * myNode = shmat(shmd, 0, 0);
+  printf(" %s: %s (%s)\n",myNode->artist,myNode->song_name,myNode->album_name);
+  return myNode->next;
+}
+
+//prints each artist bucket (start w first shmd)
+void print_list(int shmd) {
   //make new node copy, so as not to modify original pointer.
-  struct song_node *data;
-  struct song_node * newNode = myNode;
+  // struct song_node * newNode = shmat(shmd, 0, 0);
+
   //if current node is null, print nothing!
-  if (newNode == NULL) {
+  if (shmd == 0) {
     printf("{}\n");
     return;
   }
   //if it's not null:
   //loop which stops once there is no next node.
-  while (newNode->next != 0) {
-    printf(" %s: %s |",newNode->artist,newNode->song_name);
-      newNode=(struct song_node *) shmat(newNode->next,0,0);
+  while (shmd) {
+    printf("shmd:%d\n", shmd);
+    shmd = print_song_shmd(shmd);
+    printf("next song in bucket...\n");
   }
-  printf(" %s: %s",newNode->artist, newNode->song_name);
   //there is no next node, but still need to print current (last) node:
   //printf(" %s: %s ",newNode->artist,newNode->name);
   printf("\n");
@@ -111,8 +129,22 @@ void print_list(struct song_node * myNode) {
   //printf("]");
   return;
 }
+
+//prints entire library based on artists array
+void print_library() {
+  int i=0;
+  while (artists[i]){
+    //printf("shmd: %d\n", artists[i]);
+    print_list(artists[i]);
+    i++;
+    printf("checking next bucket...\n");
+  }
+}
+
+
 //prompts user to enter data for a song, fills in this data to struct
-void enter_song_data(struct song_node * myNode) {
+void enter_song_data(int shmd) {
+  struct song_node * myNode = shmat(shmd, 0, 0);
   char input[100];
   char * sep; // used for strsep
   //get song Name
@@ -124,15 +156,62 @@ void enter_song_data(struct song_node * myNode) {
 
   //get artist
   printf("Enter artist name: ");
-  fgets(myNode->artist, 100, stdin);
+  fgets(input, 100, stdin);
   sep = &input[0];
   strncpy(myNode->artist, strsep(&sep, "\n"), 100);
+
+  //get album info
+  printf("Enter album name: ");
+  fgets(input, 100, stdin);
+  sep = &input[0];
+  strncpy(myNode->album_name, strsep(&sep, "\n"), 100);
   // strncpy(sep, input, 100);
   // sep = strsep(&sep, "\n");
   // strncpy(input, sep, 100); <- trying to get rid of \n
+  print_song(myNode);
 }
 
-// int main() {
-//   populate_songs();
-//   return 0;
-// }
+
+//SONG LIBRARY FUNCTIONS----------------------------
+void initialize_table() {
+  int i=0;
+  for (int i=0;i<100;i++) {
+    artists[i] = 0;
+  }
+}
+
+void add_song(int newSongshmd) {
+  printf("adding ");
+  int i=0;
+  int shmd2;
+  struct song_node * newSong = shmat(newSongshmd,0,0);
+  print_song(newSong);
+
+  struct song_node * curSong;
+  int placed = 0;
+
+  //loop through albums to see if album already added
+  while (artists[i] && placed == 0) {
+    shmd2 = artists[i];
+    curSong = shmat(shmd2,0,0);
+    printf("\tchecking ");
+    print_song(curSong);
+    //found album!
+    if (strcmp(newSong->artist, curSong->artist) == 0) {
+      printf("placing at [%d]\n",i);
+      //loop until end of songs in album to place new song
+      while(curSong->next) {
+        shmd2 = curSong->next;
+        curSong = shmat(shmd2, 0, 0);
+      }
+      curSong->next = newSongshmd;
+      placed = 1;
+    }
+    i++;
+  }
+  //didn't find album in list, add to end
+  if (placed == 0) {
+    printf("placing at [%d]\n",i);
+    artists[i] = newSongshmd;
+  }
+}
