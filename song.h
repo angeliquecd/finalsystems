@@ -7,9 +7,15 @@ struct song_node {
   int next;
 };
 
+
 struct song_node * newSong(char artisty[],char songy[],char albumy[],char pathy[],int genrey);
-void print_list(struct song_node * myNode);
+void print_list(int shmd);
 void print_song(struct song_node * myNode);
-void enter_song_data(struct song_node * myNode) ;
+void enter_song_data(int shmd) ;
 struct song_node * populate_songs(int num);
-struct song_node * initSong(char pathp[],int i,int max);
+int initSong(char pathp[],int i,int max);
+
+//SONG LIBRARY STUFF--------------
+int artists[100]; //stores shmids of songs starting each album
+void initialize_table();
+void add_song(int newSongshmd);
