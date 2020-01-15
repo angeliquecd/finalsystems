@@ -139,6 +139,32 @@ print_library();
 if (strcmp(s,"CREATE")==0){
   //makes a lil shell where you can write to playlists
   //i think we agreed that playlists are text files w a list of song addresses
+  printf("Welcome to the playlist maker! Enter the title of your new playlist: ");
+  char * name;
+  fgets(name,100,stdin);
+  strsep(&name,"\n");
+  int fd = open(strcat(name, ".txt"), O_CREAT, O_RDWR, 664);
+  printf("Playlist started! Enter the name of a song to add: ");
+  char * song;
+  fgets(song,100,stdin);
+  strsep(&song,"\n");
+  // searchsongs(song);
+  write(fd, song, 100);
+  printf("Are you done building the playlist? y/n ");
+  char * done;
+  fgets(done,100,stdin);
+  strsep(&done,"\n");
+  if (strcmp(done, "n") == 0){
+    while (strcmp(done, "n") == 0){
+      printf("Enter the name of a song to add: ");
+      fgets(song,100,stdin);
+      strsep(&song,"\n");
+      // searchsongs(song);
+      write(fd, song, 100);
+      printf("Are you done building the playlist? y/n ");
+      fgets(done,100,stdin);
+      strsep(&done,"\n");
+    }
 }
 if (strcmp(s,"DELETE")==0){
   int a;
@@ -151,4 +177,5 @@ printf("Library deleted.");
 shmdt(data);
 }
 printf("\nExiting the program.\n");
+}
 }

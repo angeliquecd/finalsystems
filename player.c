@@ -13,3 +13,16 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include "song.c"
+
+void stop(){
+
+}
+
+void start_again(){
+  
+}
+
+int main(){
+  return 0;
+}
