@@ -173,8 +173,8 @@ void enter_song_data(int shmd) {
 
   //get genre
   printf("Enter genre number:\n");
-  printf("0: Blues\n 1: Rock \n 2: Country\n 3: Dance\n4: Hip-hop\n5: Funk\n6: Jazz\n7: Pop\n");
-  printf("8: Metal\n9: Oldies\n10:Rhythm and Blues \n11: Rap\n 12: Classical\n 13: Reggae\n14: Indie\n15: Other\n");
+  printf("0: Blues\n1: Rock\n2: Country\n3: Dance\n4: Hip-hop\n5: Funk\n6: Jazz\n7:Pop\n");
+  printf("8: Metal\n9: Oldies\n10:Rhythm and Blues\n11: Rap\n12: Classical\n13: Reggae\n14: Indie\n15: Other\n");
   fgets(input, 100, stdin);
   sep = &input[0];
   int g;
