@@ -6,7 +6,10 @@ struct song_node {
   int genre;
   int next;
 };
-
+struct genre_index{
+  int num;
+  char name[];
+}
 
 struct song_node * newSong(char artisty[],char songy[],char albumy[],char pathy[],int genrey);
 void print_list(int shmd);

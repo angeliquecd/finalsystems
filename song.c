@@ -96,7 +96,7 @@ struct song_node * newSong(char artisty[],char songy[],char albumy[],char pathy[
 }
 
 void print_song(struct song_node * myNode){
-  printf(" %s: %s (%s)\n",myNode->artist,myNode->song_name,myNode->album_name);
+  printf(" %s: %s (%s), genre %d \n",myNode->artist,myNode->song_name,myNode->album_name,myNode->genre);
 }
 
 int print_song_shmd(int shmd ) {
@@ -117,11 +117,19 @@ void print_list(int shmd) {
   }
   //if it's not null:
   //loop which stops once there is no next node.
+<<<<<<< HEAD
   while (shmd) {
     printf("shmd:%d\n", shmd);
     shmd = print_song_shmd(shmd);
     printf("next song in bucket...\n");
   }
+=======
+  while (newNode->next != 0) {
+    printf(" %s: %s (%s), genre %d \n",newNode->artist,newNode->song_name,newNode->album_name,newNode->genre);
+      newNode=(struct song_node *) shmat(newNode->next,0,0);
+  }
+  printf(" %s: %s (%s), genre %d \n", newNode->artist,newNode->song_name,newNode->album_name,newNode->genre);
+>>>>>>> 7f535b8f56689e1a0bcd334b148df777f0b47333
   //there is no next node, but still need to print current (last) node:
   //printf(" %s: %s ",newNode->artist,newNode->name);
   printf("\n");
@@ -160,11 +168,29 @@ void enter_song_data(int shmd) {
   sep = &input[0];
   strncpy(myNode->artist, strsep(&sep, "\n"), 100);
 
+<<<<<<< HEAD
   //get album info
+=======
+  //get album
+>>>>>>> 7f535b8f56689e1a0bcd334b148df777f0b47333
   printf("Enter album name: ");
   fgets(input, 100, stdin);
   sep = &input[0];
   strncpy(myNode->album_name, strsep(&sep, "\n"), 100);
+<<<<<<< HEAD
+=======
+
+  //get genre
+  printf("Enter genre number:\n");
+  printf("0: Blues\n 1: Rock \n 2: Country\n 3: Dance\n4: Hip-hop\n5: Funk\n6: Jazz\n7: Pop\n");
+  printf("8: Metal\n9: Oldies\n10:Rhythm and Blues \n11: Rap\n 12: Classical\n 13: Reggae\n14: Indie\n15: Other\n");
+  fgets(input, 100, stdin);
+  sep = &input[0];
+  int g;
+  sscanf(sep, "%d", &g);
+  myNode->genre = g;
+
+>>>>>>> 7f535b8f56689e1a0bcd334b148df777f0b47333
   // strncpy(sep, input, 100);
   // sep = strsep(&sep, "\n");
   // strncpy(input, sep, 100); <- trying to get rid of \n
