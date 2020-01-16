@@ -9,8 +9,12 @@ struct song_node {
 char * GENRE_INDEX[] = {"Blues", "Rock", "Country", "Dance", "Hip-hop", "Funk", "Jazz", "Pop", "Metal", "Oldies", "Rhythm and Blues", "Rap", "Classical", "Reggae", "Indie", "Other"};
 
 struct song_node * newSong(char artisty[],char songy[],char albumy[],char pathy[],int genrey);
+
+//PRINTING FUNCTIONS
 void print_list(int shmd);
 void print_song(struct song_node * myNode);
+
+char * get_artist(int i);
 void enter_song_data(int shmd) ;
 struct song_node * populate_songs(int num);
 int initSong(char pathp[],int i,int max);

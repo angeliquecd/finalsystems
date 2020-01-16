@@ -99,16 +99,20 @@ void print_song(struct song_node * myNode){
   printf(" %s: %s (%s), genre %d \n",myNode->artist,myNode->song_name,myNode->album_name,myNode->genre);
 }
 
-int print_song_shmd(int shmd ) {
+int print_song_shmd(int shmd, int num) {
   struct song_node * myNode = shmat(shmd, 0, 0);
-  printf(" %s: %s (%s)\n",myNode->artist,myNode->song_name,myNode->album_name);
+  printf("\t[%d] %s: %s (%s)\n",num, myNode->artist,myNode->song_name,myNode->album_name);
   return myNode->next;
 }
 
 //prints each artist bucket (start w first shmd)
-void print_list(int shmd) {
+void print_list(int shmd, int num) {
   //make new node copy, so as not to modify original pointer.
   struct song_node * newNode = shmat(shmd, 0, 0);
+  if (newNode == -1) {
+    printf("error shamting for shmd=%d\n", shmd);
+    return;
+  }
 
   //if current node is null, print nothing!
   if (shmd == 0) {
@@ -118,27 +122,35 @@ void print_list(int shmd) {
   //if it's not null:
   //loop which stops once there is no next node.
   while (shmd) {
-    printf("shmd:%d\n", shmd);
-    shmd = print_song_shmd(shmd);
-    printf("next song in bucket...\n");
+    //printf("shmd:%d\n", shmd);
+    shmd = print_song_shmd(shmd, num);
+    num++;
+    // printf("next song in bucket...\n");
   }
-  while (newNode->next != 0) {
-    printf(" %s: %s (%s), genre %d \n",newNode->artist,newNode->song_name,newNode->album_name,newNode->genre);
-      newNode=(struct song_node *) shmat(newNode->next,0,0);
-  }
-  printf(" %s: %s (%s), genre %d \n", newNode->artist,newNode->song_name,newNode->album_name,newNode->genre);
-  //there is no next node, but still need to print current (last) node:
-  //printf(" %s: %s ",newNode->artist,newNode->name);
+
   printf("\n");
   //nvm if there is no next
   //printf("]");
   return;
 }
 
+//returns artist associated with given index/bucket in artists table
+char * get_artist(int i) {
+  char * out;
+  struct song_node * first = shmat(artists[i], 0, 0);
+  if (first == -1) {
+    printf("error shmating for shmd=%d\n", artists[i]);
+    return out;
+  }
+  return first->artist;
+}
+
 //prints entire library based on artists array
 void print_library() {
   int i=0;
+  int num=0;
   while (artists[i]){
+    printf("BUCKET: %s\n", get_artist(i));
     //printf("shmd: %d\n", artists[i]);
     print_list(artists[i]);
     i++;

@@ -120,29 +120,24 @@ if (strcmp(s,"POPULATE")==0){
   //this is where you can search for, delete songs
   //add songs?
 }
-if (strcmp(s,"BROWSE\n")==0){
-  //  int a =0;
-  // shmd=shmget(KEY2+a,SEG_SIZE,0);
-  // if (shmd<0) printf("Error with browse. %d",errno);
-  // //printf("Did that");
-  // data=( struct song_node *) shmat(shmd,0,0);
-//  printf("%p or %d",data,shmd);
+if (strcmp(s,"BROWSE")==0){
 printf("Song library: \n");
-//printf("%d\n", artists[0]);
-struct song_node * test = shmat(65537, 0, 0);
-print_song(test);
 print_library();
-//printf("The id is: %d",shmd);
-  //print_song(data);
-  //print_list(data);
+
 }
 if (strcmp(s,"CREATE")==0){
   //makes a lil shell where you can write to playlists
   //i think we agreed that playlists are text files w a list of song addresses
   printf("Welcome to the playlist maker! Enter the title of your new playlist: ");
-  char * name;
+  //get name of playlist
+  char name[100];
+  char * sep;
   fgets(name,100,stdin);
-  strsep(&name,"\n");
+  sep = &name[0];
+  strsep(&sep,"\n");
+  printf("\tYour playlist: %s\n", name);
+
+  //create file for playlist
   int fd = open(strcat(name, ".txt"), O_CREAT, O_RDWR, 664);
   printf("Playlist started! Enter the name of a song to add: ");
   char * song;
@@ -158,7 +153,7 @@ if (strcmp(s,"CREATE")==0){
     while (strcmp(done, "n") == 0){
       printf("Enter the name of a song to add: ");
       fgets(song,100,stdin);
-      strsep(&song,"\n");
+      strsep(&song,"\n");shmdt(data);
       // searchsongs(song);
       write(fd, song, 100);
       printf("Are you done building the playlist? y/n ");
@@ -173,9 +168,11 @@ if (strcmp(s,"DELETE")==0){
   q=shmctl(shmd,IPC_RMID,0);
 }
 printf("Library deleted.");
+} else{
+  shmdt(data);
+  printf("\nExiting the program.\n");
 }
-shmdt(data);
+
 }
-printf("\nExiting the program.\n");
 }
 }
