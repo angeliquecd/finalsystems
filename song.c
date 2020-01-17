@@ -109,7 +109,7 @@ int print_song_shmd(int shmd, int num) {
 void print_list(int shmd, int num) {
   //make new node copy, so as not to modify original pointer.
   struct song_node * newNode = shmat(shmd, 0, 0);
-  if (newNode == -1) {
+  if (newNode == NULL) {
     printf("error shamting for shmd=%d\n", shmd);
     return;
   }
@@ -138,7 +138,7 @@ void print_list(int shmd, int num) {
 char * get_artist(int i) {
   char * out;
   struct song_node * first = shmat(artists[i], 0, 0);
-  if (first == -1) {
+  if (first == NULL) {
     printf("error shmating for shmd=%d\n", artists[i]);
     return out;
   }
@@ -152,7 +152,7 @@ void print_library() {
   while (artists[i]){
     printf("BUCKET: %s\n", get_artist(i));
     //printf("shmd: %d\n", artists[i]);
-    print_list(artists[i]);
+    print_list(artists[i], 0);
     i++;
     printf("checking next bucket...\n");
   }
@@ -185,8 +185,8 @@ void enter_song_data(int shmd) {
 
   //get genre
   printf("Enter genre number:\n");
-  printf("0: Blues\n1: Rock\n2: Country\n3: Dance\n4: Hip-hop\n5: Funk\n6: Jazz\n7:Pop\n");
-  printf("8: Metal\n9: Oldies\n10:Rhythm and Blues\n11: Rap\n12: Classical\n13: Reggae\n14: Indie\n15: Other\n");
+  printf("0: Blues\n1: Rock\n2: Country\n3: Dance\n4: Hip-hop\n5: Funk\n6: Jazz\n7: Pop\n");
+  printf("8: Metal\n9: Oldies\n10: Rhythm and Blues\n11: Rap\n12: Classical\n13: Reggae\n14: Indie\n15: Other\n");
   fgets(input, 100, stdin);
   sep = &input[0];
   int g;

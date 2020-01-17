@@ -11,7 +11,7 @@ char * GENRE_INDEX[] = {"Blues", "Rock", "Country", "Dance", "Hip-hop", "Funk", 
 struct song_node * newSong(char artisty[],char songy[],char albumy[],char pathy[],int genrey);
 
 //PRINTING FUNCTIONS
-void print_list(int shmd);
+void print_list(int shmd, int num);
 void print_song(struct song_node * myNode);
 
 char * get_artist(int i);
