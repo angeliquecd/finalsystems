@@ -153,7 +153,7 @@ if (strcmp(s,"CREATE")==0){
     while (strcmp(done, "n") == 0){
       printf("Enter the name of a song to add: ");
       fgets(song,100,stdin);
-      strsep(&song,"\n");shmdt(data);
+      strsep(&song,"\n");
       // searchsongs(song);
       write(fd, song, 100);
       printf("Are you done building the playlist? y/n ");
