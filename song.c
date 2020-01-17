@@ -99,8 +99,8 @@ void print_song(struct song_node * myNode){
   printf(" %s: %s (%s), genre %d \n",myNode->artist,myNode->song_name,myNode->album_name,myNode->genre);
 }
 
-int print_song_shmd(int shmd, int num) {
-  struct song_node * myNode = shmat(shmd, 0, 0);
+int print_song_shmd(struct song_node * myNode, int num) {
+  //struct song_node * myNode = shmat(shmd, 0, 0);
   printf("\t[%d] %s: %s (%s)\n",num, myNode->artist,myNode->song_name,myNode->album_name);
   return myNode->next;
 }
@@ -123,7 +123,7 @@ int print_list(int shmd, int num) {
   //loop which stops once there is no next node.
   while (shmd) {
     //printf("shmd:%d\n", shmd);
-    shmd = print_song_shmd(shmd, num);
+    shmd = print_song_shmd(newNode, num);
     num++;
     // printf("next song in bucket...\n");
   }
