@@ -106,18 +106,18 @@ int print_song_shmd(int shmd, int num) {
 }
 
 //prints each artist bucket (start w first shmd)
-void print_list(int shmd, int num) {
+int print_list(int shmd, int num) {
   //make new node copy, so as not to modify original pointer.
   struct song_node * newNode = shmat(shmd, 0, 0);
   if (newNode == NULL) {
     printf("error shamting for shmd=%d\n", shmd);
-    return;
+    return -1;
   }
 
   //if current node is null, print nothing!
   if (shmd == 0) {
     printf("{}\n");
-    return;
+    return -1;
   }
   //if it's not null:
   //loop which stops once there is no next node.
@@ -131,7 +131,7 @@ void print_list(int shmd, int num) {
   printf("\n");
   //nvm if there is no next
   //printf("]");
-  return;
+  return num;
 }
 
 //returns artist associated with given index/bucket in artists table
@@ -152,8 +152,7 @@ void print_library() {
   while (artists[i]){
     printf("BUCKET: %s\n", get_artist(i));
     //printf("shmd: %d\n", artists[i]);
-    print_list(artists[i], 0);
-    i++;
+    i = print_list(artists[i], i);
     printf("checking next bucket...\n");
   }
 }
