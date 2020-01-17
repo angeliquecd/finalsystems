@@ -161,18 +161,17 @@ if (strcmp(s,"CREATE")==0){
       strsep(&done,"\n");
     }
 }
+}
 if (strcmp(s,"DELETE")==0){
   int a;
   for ( a=0;a<i;a++){
   shmd=shmget(KEY2+a,SEG_SIZE,0);
   q=shmctl(shmd,IPC_RMID,0);
 }
-printf("Library deleted.");
-} else{
-  shmdt(data);
-  printf("\nExiting the program.\n");
+printf("Library deleted.\n");
 }
 
 }
-}
+  shmdt(data);
+  printf("\nExiting the program.\n");
 }
