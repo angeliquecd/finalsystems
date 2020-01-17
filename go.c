@@ -139,12 +139,18 @@ if (strcmp(s,"CREATE")==0){
 
   //create file for playlist
   int fd = open(strcat(name, ".txt"), O_CREAT, O_RDWR, 664);
+  if (fd < 0){
+    printf("errno %d error: %s\n", errno, strerror(errno));
+  }
   printf("Playlist started! Enter the name of a song to add: ");
   char * song;
   fgets(song,100,stdin);
   strsep(&song,"\n");
   // searchsongs(song);
   write(fd, song, 100);
+  if (write < 0){
+    printf("errno %d error: %s\n", errno, strerror(errno));
+  }
   printf("Are you done building the playlist? y/n ");
   char * done;
   fgets(done,100,stdin);
@@ -156,6 +162,9 @@ if (strcmp(s,"CREATE")==0){
       strsep(&song,"\n");
       // searchsongs(song);
       write(fd, song, 100);
+      if (write < 0){
+        printf("errno %d error: %s\n", errno, strerror(errno));
+      }
       printf("Are you done building the playlist? y/n ");
       fgets(done,100,stdin);
       strsep(&done,"\n");
