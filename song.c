@@ -110,7 +110,7 @@ int print_list(int shmd, int num) {
   //make new node copy, so as not to modify original pointer.
   struct song_node * newNode = shmat(shmd, 0, 0);
   if (newNode == NULL) {
-    printf("error shamting for shmd=%d\n", shmd);
+    printf("error shmating for shmd=%d\n", shmd);
     return -1;
   }
 
