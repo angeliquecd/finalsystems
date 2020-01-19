@@ -23,7 +23,8 @@ int initSong(char pathp[],int i,int max) {
 //  printf("Got here.");
     if (shmd<0) printf("Error opening shared memory.");
 
-  data=(struct song_node *) shmat(shmd,0,0);
+  data = malloc(sizeof(struct song_node));
+  data = (struct song_node *) shmat(shmd,0,0);
   data->next = 0;
 //  printf("The id is: %d\n",shmd);
 // if (max-i>1){
@@ -36,13 +37,19 @@ int initSong(char pathp[],int i,int max) {
 //   strncpy(data->path, pathp, 150);//puts path onto shared memory pieces
 // //    printf("%s and %d", data->path,data->next);
 // //  printf("This is in init: %s",data->path);
+
+//detatch shared memory
+  int status = shmdt(data);
+  if (status == -1) printf("error shmdting: %s", strerror(errno));
+
   return shmd;
 }
 
 struct song_node * populate_songs(int num) {
+  struct song_node * cur_song; //current song being initialized and created.
   printf("# songs found: %d\n", num);
     struct song_node * song;
-    int shmd;
+    int shmd, status;
     struct song_node *data;
     char * dirname = "songs/";
     int i=0;
@@ -65,12 +72,20 @@ int times=0;
       if (cur->d_type != DT_DIR) {
         strcpy(fpath, cur->d_name);
         printf("file: %s\n", fpath);
-        printf("i: %d\n", i);
+        // printf("i: %d\n", i);
         shmd = initSong(fpath,i,num);
-        printf("shmd: %d initialized.\n", shmd);
+        // printf("shmd: %d initialized.\n", shmd);
       //  printf("In populate: %s",s  ong->path);
-        enter_song_data(shmd);
+        enter_song_data(shmd, cur_song);
+        cur_song = (struct song_node * )shmat(shmd, 0, 0);
+        printf("init'ed song w artist=%s\n", cur_song->artist);
+        printf("init'ed song w name=%s\n", cur_song->song_name);
+        printf("init'ed song w next=%d\n", cur_song->next);
         add_song(shmd);
+
+        //detatch shared memory
+        status = shmdt(cur_song);
+        if (status == -1) printf("error shmdting: %s", strerror(errno));
 
 //times++;
   i++;
@@ -99,10 +114,16 @@ void print_song(struct song_node * myNode){
   printf(" %s: %s (%s), genre %d \n",myNode->artist,myNode->song_name,myNode->album_name,myNode->genre);
 }
 
-int print_song_shmd(struct song_node * myNode, int num) {
-  //struct song_node * myNode = shmat(shmd, 0, 0);
+int print_song_shmd(int shmd, int num) {
+  int out; //next shmd, return value
+  struct song_node * myNode = shmat(shmd, 0, 0);
   printf("\t[%d] %s: %s (%s)\n",num, myNode->artist,myNode->song_name,myNode->album_name);
-  return myNode->next;
+  out = myNode->next;
+  //detatch shared memory
+  int status = shmdt(myNode);
+  if (status == -1) printf("error shmdting: %s\n", strerror(errno));
+
+  return out;
 }
 
 //prints each artist bucket (start w first shmd)
@@ -123,26 +144,36 @@ int print_list(int shmd, int num) {
   //loop which stops once there is no next node.
   while (shmd) {
     //printf("shmd:%d\n", shmd);
-    shmd = print_song_shmd(newNode, num);
+    shmd = print_song_shmd(shmd, num);
     num++;
     // printf("next song in bucket...\n");
   }
 
   printf("\n");
+
+  //detach shared memory
+  int status = shmdt(newNode);
+  if (status == -1) printf("error shmdting: %s\n", strerror(errno));
   //nvm if there is no next
   //printf("]");
+
   return num;
 }
 
 //returns artist associated with given index/bucket in artists table
 char * get_artist(int i) {
   char * out;
+  int status;
   struct song_node * first = shmat(artists[i], 0, 0);
   if (first == NULL) {
     printf("error shmating for shmd=%d\n", artists[i]);
     return out;
   }
-  return first->artist;
+  out = first->artist;
+  //detach shared memory
+  status = shmdt(first);
+  if (status==-1) printf("erroring shmdting. %s\n", strerror(errno));
+  return out;
 }
 
 //prints entire library based on artists array
@@ -152,15 +183,16 @@ void print_library() {
   while (artists[i]){
     printf("BUCKET: %s\n", get_artist(i));
     //printf("shmd: %d\n", artists[i]);
-    i = print_list(artists[i], i);
-    printf("checking next bucket...\n");
+    // i = print_list(artists[i], i);
+    // printf("checking next bucket...\n");
+    i++;
   }
 }
 
 
 //prompts user to enter data for a song, fills in this data to struct
-void enter_song_data(int shmd) {
-  struct song_node * myNode = shmat(shmd, 0, 0);
+void enter_song_data(int shmd, struct song_node * myNode) {
+  myNode = shmat(shmd, 0, 0);
   char input[100];
   char * sep; // used for strsep
   //get song Name
@@ -218,10 +250,12 @@ void add_song(int newSongshmd) {
   int placed = 0;
 
   //loop through albums to see if album already added
-  while (artists[i] && placed == 0) {
+  while (artists[i] != 0 && placed == 0) {
+    printf("shmd = %d. artist here\n", artists[i]);
     shmd2 = artists[i];
     curSong = shmat(shmd2,0,0);
-    printf("\tchecking ");
+    if (curSong == -1) printf("error shmating. %s\n", strerror(errno));
+    printf("\tchecking \n");
     print_song(curSong);
     //found album!
     if (strcmp(newSong->artist, curSong->artist) == 0) {
