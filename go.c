@@ -138,7 +138,7 @@ if (strcmp(s,"CREATE")==0){
   printf("\tYour playlist: %s\n", name);
 
   //create file for playlist
-  int fd = open(strcat(name, ".txt"), O_CREAT, O_RDWR, 664);
+  int fd = open(strcat(name, ".txt"), O_CREAT | O_RDWR, 664);
   if (fd < 0){
     printf("errno %d error: %s\n", errno, strerror(errno));
   }
