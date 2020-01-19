@@ -168,11 +168,14 @@ char * get_artist(int i) {
   if (first == NULL) {
     printf("error shmating for shmd=%d\n", artists[i]);
     return out;
-  }
-  out = first->artist;
+  } else printf("success shmating to get artist!\n");
+
+  strcpy(out,first->artist);
+
   //detach shared memory
   status = shmdt(first);
   if (status==-1) printf("erroring shmdting. %s\n", strerror(errno));
+
   return out;
 }
 
@@ -182,9 +185,9 @@ void print_library() {
   int num=0;
   while (artists[i]){
     printf("BUCKET: %s\n", get_artist(i));
-    //printf("shmd: %d\n", artists[i]);
-    // i = print_list(artists[i], i);
-    // printf("checking next bucket...\n");
+    // printf("shmd: %d\n", artists[i]);
+    i = print_list(artists[i], i);
+    printf("checking next bucket...\n");
     i++;
   }
 }

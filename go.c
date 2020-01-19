@@ -122,14 +122,14 @@ if (strcmp(s,"POPULATE")==0){
 }
 if (strcmp(s,"BROWSE")==0){
 printf("Song library: \n");
-struct song_node * test = shmat(artists[0], 0, 0);
-printf("TEST: %s\n", test->artist);
-shmdt(test);
-printf("next: %d/n", test->next);
-test = shmat(test->next, 0, 0);
-printf("TEST2: %s \n", test->artist);
+// struct song_node * test = shmat(artists[0], 0, 0);
+// printf("TEST: %s\n", test->artist);
+// printf("next: %d/n", test->next);
+// test = shmat(test->next, 0, 0);
+// printf("TEST2: %s \n", test->artist);
+// shmdt(test);
 
-//print_library();
+print_library();
 
 }
 if (strcmp(s,"CREATE")==0){
