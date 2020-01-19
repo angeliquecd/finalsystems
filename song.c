@@ -257,7 +257,7 @@ void add_song(int newSongshmd) {
     printf("shmd = %d. artist here\n", artists[i]);
     shmd2 = artists[i];
     curSong = shmat(shmd2,0,0);
-    if (curSong == -1) printf("error shmating. %s\n", strerror(errno));
+    if (curSong == NULL) printf("error shmating. %s\n", strerror(errno));
     printf("\tchecking \n");
     print_song(curSong);
     //found album!
