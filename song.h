@@ -14,6 +14,7 @@ struct song_node * newSong(char artisty[],char songy[],char albumy[],char pathy[
 int print_list(int shmd, int num);
 void print_song(struct song_node * myNode);
 int print_song_shmd(int shmd, int num);
+int print_library();
 
 char * get_artist(int i);
 void enter_song_data(int shmd, struct song_node * in) ;

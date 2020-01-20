@@ -135,6 +135,13 @@ print_library();
 if (strcmp(s,"CREATE")==0){
   //makes a lil shell where you can write to playlists
   //i think we agreed that playlists are text files w a list of song addresses
+  int num; //represents number of songs in library
+  int id; //song id user chooses to add to playlist
+  int status;
+  char * path;
+  char * input = malloc(10); //user input used throughout.
+  char * done = "n"; //is user done creating playlist ("y" / "n")
+
   printf("Welcome to the playlist maker! Enter the title of your new playlist: ");
   //get name of playlist
   char name[100];
@@ -142,41 +149,46 @@ if (strcmp(s,"CREATE")==0){
   fgets(name,100,stdin);
   sep = &name[0];
   strsep(&sep,"\n");
-  printf("\tYour playlist: %s\n", name);
 
   //create file for playlist
   int fd = open(strcat(name, ".txt"), O_CREAT | O_RDWR, 664);
-  if (fd < 0){
-    printf("errno %d error: %s\n", errno, strerror(errno));
-  }
-  printf("Playlist started! Enter the name of a song to add: ");
-  char * song;
-  fgets(song,100,stdin);
-  strsep(&song,"\n");
-  // searchsongs(song);
-  write(fd, song, 100);
-  if (write < 0){
-    printf("errno %d error: %s\n", errno, strerror(errno));
-  }
-  printf("Are you done building the playlist? y/n ");
-  char * done;
-  fgets(done,100,stdin);
-  strsep(&done,"\n");
-  if (strcmp(done, "n") == 0){
-    while (strcmp(done, "n") == 0){
-      printf("Enter the name of a song to add: ");
-      fgets(song,100,stdin);
-      strsep(&song,"\n");
-      // searchsongs(song);
-      write(fd, song, 100);
-      if (write < 0){
-        printf("errno %d error: %s\n", errno, strerror(errno));
-      }
-      printf("Are you done building the playlist? y/n ");
-      fgets(done,100,stdin);
-      strsep(&done,"\n");
+  if (fd < 0) printf("errno %d error: %s\n", errno, strerror(errno));
+
+  printf("Playlist '%s' started!\n", name);
+  //continuous loop for user to add songs until they say stop
+  while (strcmp(done, "n") == 0) {
+    num = print_library(); // num represents total songs
+    printf("Enter the ID of a song to add: ");
+    if (fgets(input,10,stdin) == NULL) printf("error getting input: %s", strerror(errno));
+    // printf("You entered: %s\n", input);
+    input = strsep(&input,"\n");
+    printf("You entered: %s\n", input);
+    //convert string input to int id:
+    id = atoi(input);
+    printf("Adding id: %d\n", id);
+
+    //user entered non-number
+    if (id == 0) {
+      printf("Please enter a number!\n");
     }
-}
+    //id is not valid
+    else if (id > num || id <= 0) {
+      printf("Please enter an ID that is in range!\n");
+    }
+    //input is a valid id
+    else {
+      // sprintf(input, "%d", id);
+      // status = write(fd, input, sizeof(input));
+      path = getPath(id);
+      if (status == 0) printf("errno %d error: %s\n", errno, strerror(errno));
+    }
+    printf("Are you done building the playlist? y/n ");
+    fgets(done,100,stdin);
+    done = strsep(&done,"\n");
+  }
+  // searchsongs(song);
+  free(input);
+
 }
 if (strcmp(s,"DELETE")==0){
   int a;

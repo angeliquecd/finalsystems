@@ -170,26 +170,76 @@ char * get_artist(int i) {
     return out;
   } else printf("success shmating to get artist!\n");
 
-  strcpy(out,first->artist);
+  printf("artist: %s\n", first->artist);
+  return first->artist;
+  // strcpy(out,first->artist);
+  // printf("artist: %s\n", out);
+  //
+  // //detach shared memory
+  // status = shmdt(first);
+  // if (status==-1) printf("erroring shmdting. %s\n", strerror(errno));
+  //
+  // return out;
+}
 
-  //detach shared memory
-  status = shmdt(first);
-  if (status==-1) printf("erroring shmdting. %s\n", strerror(errno));
+//iterates through list (each artist bucket)
+//returns an updated num (the id of the song we are up to)
+int findIdInList(int num, int id) {
+  int status, shmd;
+  //get first song node in bucket
+  struct song_node * newNode = shmat(shmd, 0, 0);
+  if (newNode == NULL) {
+    printf("error shmating for shmd=%d\n", shmd);
+    return -1;
+  }
+  //if current node is null
+  if (shmd == 0) return -1;
+  //if it's not null:
+  //loop which stops once there is no next node.
+  while (shmd) {
+    shmd = newNode->next;
+    status = shmdt(newNode);
+    if (status == -1) printf("error shmdting: %s", strerror(errno));
+    num++;
+    if (num == id) return num;
+  }
+  return num; //id never matched num
+}
 
-  return out;
+
+//returns the path of the song based on its id.
+//iterates through library same way as print_library().
+char * getPath(int id) {
+  char * path;
+  int i=0;
+  int num=1;
+  while (artists[i] && num < id) {
+    num = findIdInList(num, id);
+    //if shmd was invalid
+    if (num == -1) {
+      printf("Song not found.\n");
+      return path;
+    }
+    if (num == id) {
+      printf("ID found in bucket %d\n", i);
+    }
+    i++;
+  }
+  return path;
 }
 
 //prints entire library based on artists array
-void print_library() {
+int print_library() {
   int i=0;
-  int num=0;
+  int num=1;
   while (artists[i]){
     printf("BUCKET: %s\n", get_artist(i));
     // printf("shmd: %d\n", artists[i]);
-    i = print_list(artists[i], i);
+    num = print_list(artists[i], num);
     printf("checking next bucket...\n");
     i++;
   }
+  return num;
 }
 
 
@@ -227,10 +277,10 @@ void enter_song_data(int shmd, struct song_node * myNode) {
   sscanf(sep, "%d", &g);
   myNode->genre = g;
 
-  // strncpy(sep, input, 100);
-  // sep = strsep(&sep, "\n");
-  // strncpy(input, sep, 100); <- trying to get rid of \n
   print_song(myNode);
+
+  int status = shmdt(myNode);
+  if (status == -1) printf("error shmdting: %s", strerror(errno));
 }
 
 
@@ -245,7 +295,7 @@ void initialize_table() {
 void add_song(int newSongshmd) {
   printf("adding ");
   int i=0;
-  int shmd2;
+  int shmd2, status;
   struct song_node * newSong = shmat(newSongshmd,0,0);
   print_song(newSong);
 
@@ -266,6 +316,8 @@ void add_song(int newSongshmd) {
       //loop until end of songs in album to place new song
       while(curSong->next) {
         shmd2 = curSong->next;
+        status = shmdt(curSong);
+        if (status == -1) printf("0error shmdting: %s", strerror(errno));
         curSong = shmat(shmd2, 0, 0);
       }
       curSong->next = newSongshmd;
@@ -278,4 +330,9 @@ void add_song(int newSongshmd) {
     printf("placing at [%d]\n",i);
     artists[i] = newSongshmd;
   }
+
+  //detach song nodes
+  status=shmdt(newSong);
+  if (status == -1) printf("1error shmdting: %s", strerror(errno));
+
 }
