@@ -187,8 +187,8 @@ void print_library() {
     printf("BUCKET: %s\n", get_artist(i));
     // printf("shmd: %d\n", artists[i]);
     i = print_list(artists[i], i);
-    printf("checking next bucket...\n");
-    i++;
+    printf("checking next bucket...%d\n",i);
+    //i++;
   }
 }
 
