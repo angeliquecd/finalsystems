@@ -109,14 +109,15 @@ if (strcmp(s,"POPULATE")==0){
   // shmd=shmget(KEY2,1,0);
   //   data=( struct song_node *) shmat(shmd,0,0);
   // printf("%p or %d",data,shmd);
+  clear_library();
   initialize_table();
   populate_songs(i);
-  int c=0;
-  printf("artist array shmds: ");
-  while (artists[c]){
-    printf("%d,  ", artists[c]);
-    c++;
-  }
+  // int c=0;
+  // printf("artist array shmds: ");
+  // while (artists[c]){
+  //   printf("%d,  ", artists[c]);
+  //   c++;
+  // }
   printf("\n");
   //prints library
   //this is where you can search for, delete songs
@@ -158,7 +159,7 @@ if (strcmp(s,"CREATE")==0){
   printf("Playlist '%s' started!\n", name);
   //continuous loop for user to add songs until they say stop
   while (strcmp(done, "n") == 0) {
-    num = print_library(); // num represents total songs
+    print_library(); // num represents total songs
     printf("Enter the ID of a song to add: ");
     if (fgets(input,10,stdin) == NULL) printf("error getting input: %s", strerror(errno));
     // printf("You entered: %s\n", input);
