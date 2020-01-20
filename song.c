@@ -247,7 +247,7 @@ char * getPath(int id) {
 }
 
 //prints entire library based on artists array
-void print_library() {
+int print_library() {
 //printf("Here\n");
    int i=0;
   int num=1;
@@ -273,6 +273,7 @@ void print_library() {
 //  i++;
    }
 shmdt(artistshared);
+return num;
 }
 
 
