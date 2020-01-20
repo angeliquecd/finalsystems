@@ -130,7 +130,6 @@ printf("Song library: \n");
 // test = shmat(test->next, 0, 0);
 // printf("TEST2: %s \n", test->artist);
 // shmdt(test);
-
 print_library();
 
 }
