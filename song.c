@@ -13,6 +13,7 @@
 #include "song.h"
 #define KEY 10001
 #define KEY2 1232
+#define TAB_SIZE sizeof(int)*100
 #define SEG_SIZE sizeof(struct song_node)
 
 int initSong(char pathp[],int i,int max) {
@@ -49,7 +50,8 @@ struct song_node * populate_songs(int num) {
   struct song_node * cur_song; //current song being initialized and created.
   printf("# songs found: %d\n", num);
     struct song_node * song;
-    int shmd, status;
+    int shmd, status,shmd2;
+    int * artistshared;
     struct song_node *data;
     char * dirname = "songs/";
     int i=0;
@@ -95,7 +97,14 @@ int times=0;
   }
   //  printf("%p vs. %p",song, data);
     // shmdt(song);
-
+    shmd2=shmget(KEY,TAB_SIZE,0);
+    artistshared = shmat(shmd2,0,0);
+    memcpy(artistshared, artists, TAB_SIZE);
+    shmdt(artistshared);
+    shmd2=shmget(KEY,TAB_SIZE,0);
+    artistshared = shmat(shmd2,0,0);
+    printf("shared memory: [%d] [%d]",artistshared[0],artistshared[1]);
+    shmdt(artistshared);
     return song;
   }
 
@@ -111,7 +120,7 @@ struct song_node * newSong(char artisty[],char songy[],char albumy[],char pathy[
 }
 
 void print_song(struct song_node * myNode){
-  printf(" %s: %s (%s), genre %d \n",myNode->artist,myNode->song_name,myNode->album_name,myNode->genre);
+  printf(" %s: %s (%s), genre %s \n",myNode->artist,myNode->song_name,myNode->album_name,GENRE_INDEX[myNode->genre]);
 }
 
 int print_song_shmd(int shmd, int num) {
@@ -143,7 +152,7 @@ int print_list(int shmd, int num) {
   //if it's not null:
   //loop which stops once there is no next node.
   while (shmd) {
-    //printf("shmd:%d\n", shmd);
+    printf("shmd:%d\n", shmd);
     shmd = print_song_shmd(shmd, num);
     num++;
     // printf("next song in bucket...\n");
@@ -161,16 +170,15 @@ int print_list(int shmd, int num) {
 }
 
 //returns artist associated with given index/bucket in artists table
-char * get_artist(int i) {
+char * get_artist(int place) {
   char * out;
   int status;
-  struct song_node * first = shmat(artists[i], 0, 0);
+  struct song_node * first = shmat(place, 0, 0);
   if (first == NULL) {
-    printf("error shmating for shmd=%d\n", artists[i]);
+    printf("error shmating for shmd=%d\n", place);
     return out;
   } else printf("success shmating to get artist!\n");
 
-  printf("artist: %s\n", first->artist);
   return first->artist;
   // strcpy(out,first->artist);
   // printf("artist: %s\n", out);
@@ -229,17 +237,31 @@ char * getPath(int id) {
 }
 
 //prints entire library based on artists array
-int print_library() {
-  int i=0;
-  int num=1;
-  while (artists[i]){
-    printf("BUCKET: %s\n", get_artist(i));
-    // printf("shmd: %d\n", artists[i]);
-    num = print_list(artists[i], num);
-    printf("checking next bucket...\n");
-    i++;
-  }
-  return num;
+void print_library() {
+//printf("Here\n");
+   int i=0;
+  int num=0;
+   int shmd;
+  int * artistshared;
+  // printf("Here");
+   shmd=shmget(KEY,TAB_SIZE,0);
+   if (shmd<0) printf("Error shmgetting");
+    artistshared=shmat(shmd,0,0);
+  if (artistshared<0) printf("Error shmatting");
+  // printf("Here");
+   printf("artistshared: %d",artistshared[0]);
+   int * lookat=artistshared;
+   printf("%d",lookat[i]);
+   while (lookat[i]){
+     printf("ID is: %d",lookat[i]);
+    printf("BUCKET: %s\n", get_artist(lookat[i]));
+  //   // printf("shmd: %d\n", artists[i]);
+    i = print_list(lookat[i], i);
+     printf("checking next bucket...%d\n",i);
+  //   //i++;
+//  i++;
+   }
+shmdt(artistshared);
 }
 
 
@@ -307,7 +329,7 @@ void add_song(int newSongshmd) {
     printf("shmd = %d. artist here\n", artists[i]);
     shmd2 = artists[i];
     curSong = shmat(shmd2,0,0);
-    if (curSong == -1) printf("error shmating. %s\n", strerror(errno));
+    if (curSong == NULL) printf("error shmating. %s\n", strerror(errno));
     printf("\tchecking \n");
     print_song(curSong);
     //found album!

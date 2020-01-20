@@ -16,7 +16,8 @@
 // #include "songLibrary.c"
 #include "song.c"
 #define KEY2 1232
-
+#define KEY 10001
+#define TAB_SIZE sizeof(int)*100
 #define SEG_SIZE sizeof(struct song_node)
 //this is what executes at runtime
 int initmem(){
@@ -39,6 +40,7 @@ int initmem(){
     }
     cur = readdir(dir);
   }
+  shmget(KEY,TAB_SIZE, IPC_CREAT | 0644);
   return i;
 }
 
@@ -128,7 +130,6 @@ printf("Song library: \n");
 // test = shmat(test->next, 0, 0);
 // printf("TEST2: %s \n", test->artist);
 // shmdt(test);
-
 print_library();
 
 }
@@ -196,6 +197,9 @@ if (strcmp(s,"DELETE")==0){
   shmd=shmget(KEY2+a,SEG_SIZE,0);
   q=shmctl(shmd,IPC_RMID,0);
 }
+shmd=shmget(KEY,TAB_SIZE,0);
+//printf("%d",shmd);
+q=shmctl(shmd,IPC_RMID,0);
 printf("Library deleted.\n");
 }
 
