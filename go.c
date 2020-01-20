@@ -159,7 +159,8 @@ if (strcmp(s,"CREATE")==0){
   printf("Playlist '%s' started!\n", name);
   //continuous loop for user to add songs until they say stop
   while (strcmp(done, "n") == 0) {
-    print_library(); // num represents total songs
+    num = print_library(); // num represents total songs
+    printf("Total # songs: %d\n", num);
     printf("Enter the ID of a song to add: ");
     if (fgets(input,10,stdin) == NULL) printf("error getting input: %s", strerror(errno));
     // printf("You entered: %s\n", input);
