@@ -13,6 +13,7 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include <signal.h>
 // #include "songLibrary.c"
 #include "song.c"
 #define KEY2 1232
@@ -34,8 +35,6 @@ int initmem(){
   while (cur != NULL) {
     if (cur->d_type != DT_DIR) {
         shmd=shmget(KEY2+i,SEG_SIZE, IPC_CREAT | 0644);
-      //  printf("Id created: %d\n",shmd);
-    //    printf("I is: %d\n",i);
           i++;
     }
     cur = readdir(dir);
@@ -43,7 +42,9 @@ int initmem(){
   shmget(KEY,TAB_SIZE, IPC_CREAT | 0644);
   return i;
 }
-
+void handle_sigint(int sig) {
+    printf("Caught signal %d\n", sig);
+}
 int main(int argc, char *argsv[]){
   int shmd, q;
   int i=0;
@@ -67,54 +68,88 @@ i=initmem();
   sep = &s[0];
   printf("You chose: %s\n",strsep(&sep,"\n"));
 if (strcmp(s,"PLAY")==0){
+  int f, status;
   char play[100] ="play ";
   char ** command=malloc(200);
   command[0]="play";
-  printf("\nWould you like to play a SONG, GENRE, ALBUM, ARTIST or PLAYLIST?\n");
+  char songs[100]="songs/";
+  int a =0;
+  printf("\nWould you like to play a SONG, ARTIST or PLAYLIST?\n");
   //i think we can take out the possibility of songs w the same name as the album and artists w the same name as the song
   fgets(s,100,stdin);
   strsep(&sep,"\n");
   printf("You chose: %s\n",s);
-if (strcmp(s,"PLAYLIST")==0){
 
-}
-if (strcmp(s,"ALBUM")==0){
-
-}
-if (strcmp(s,"GENRE")==0){
-
-}
-if (strcmp(s,"ARTIST")==0){
-  int f,status;
-  printf("Enter the artist name: ");
+if (strcmp(s,"SONG")==0){
+  printf("Enter the song name: ");
   fgets(s,100,stdin);
   sep = &s[0];
   strsep(&sep,"\n");
-  int a=0;
   int shmd=shmget(KEY,TAB_SIZE,0);
   int * artistshared;
 artistshared=shmat(shmd,0,0);
   printf("%d",artistshared[a]);
-   while(artistshared[a]){
+while(artistshared[a]){
+  shmd=artistshared[a];
+  while (shmd){
+  if (strcmp(s,get_title(shmd))==0){
+    char * path=getPath(shmd);
+    strcat(songs,path);
+    printf("songs: %s",songs);
+ command[1]=songs;
+ printf("%s",command[1]);
+   f=fork();
+   if (f){
+     signal(SIGINT,handle_sigint);
+     wait (&status);
+   }
+   else
+   {
+     execvp("play",command);
+   }
+  }
+  shmd=getNext(shmd);
+  }
+  a++;
+}
+  }
+if (strcmp(s,"PLAYLIST")==0){
+
+}
+if (strcmp(s,"ALBUM")==0){
+}
+if (strcmp(s,"GENRE")==0){
+}
+
+if (strcmp(s,"ARTIST")==0){
+  printf("Enter the artist name: ");
+  fgets(s,100,stdin);
+  sep = &s[0];
+  strsep(&sep,"\n");
+  int shmd=shmget(KEY,TAB_SIZE,0);
+  int * artistshared;
+artistshared=shmat(shmd,0,0);
+  printf("%d",artistshared[a]);
+while(artistshared[a]){
 //   //  printf("%s vs. ",s);
 //   //  printf("%s\n",get_artist(artistshared[a]));
-     if (strcmp(s,get_artist(artistshared[a]))==0){
-       char * path=getPath(artistshared[a]);
+if (strcmp(s,get_artist(artistshared[a]))==0){
+  shmd=artistshared[a];
+  while(shmd){
+       char * path=getPath(shmd);
 //printf("path: %s",path);
-char songs[100]="songs/";
   strcat(songs,path);
   printf("songs: %s",songs);
     command[1]=songs;
     printf("%s",command[1]);
-      printf("In here");
       f=fork();
       if (f){
         wait (&status);
+        shmd=getNext(shmd);
       }
-      else{
-           execvp("play",command);
-    }
+      else execvp("play",command);
   }
+}
     a++;
   }
 }
