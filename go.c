@@ -20,7 +20,7 @@
 #define KEY 10001
 #define TAB_SIZE sizeof(int)*100
 #define SEG_SIZE sizeof(struct song_node)
-int cpid;
+pid_t cpid;
 //this is what executes at runtime
 int initmem(){
   int i=0;
@@ -45,18 +45,17 @@ int initmem(){
 }
 static void handle_sigint(int signo){
   printf("Signal is: %d",signo);
-}
-static void stop_sighandler(int signo){
-  printf("Stopping player.\n");
-  kill(cpid, 9);
-}
-static void pause_sighandler(int signo){
-  printf("Pausing player.\n");
-  kill(cpid, SIGSTOP);
-}
-static void resume_sighandler(int signo){
-  printf("Resuming player.\n");
-  kill(cpid, SIGCONT);
+  if (signo==2)
+  {printf("Stopping player.\n");
+  kill(cpid, 9);}
+  if (signo==SIGSTOP){
+    printf("Pausing player.\n");
+    kill(cpid, SIGSTOP);
+  }
+  if (signo==SIGCONT){
+    printf("Resuming player.\n");
+    kill(cpid, SIGCONT);
+  }
 }
 
 int main(int argc, char *argsv[]){
@@ -103,7 +102,7 @@ if (strcmp(s,"SONG")==0){
   sep = &s[0];
   strsep(&sep,"\n");
   printf("%d",artistshared[a]);
-while(artistshared[a]){
+  while(artistshared[a]){
   shmd=artistshared[a];
   while (shmd){
   if (strcmp(s,get_title(shmd))==0){
@@ -113,13 +112,14 @@ while(artistshared[a]){
     printf("songs: %s",songs);
  command[1]=songs;
  printf("%s",command[1]);
-   f=fork();
-   if (f){
-     signal(SIGINT,handle_sigint);
+   cpid=fork();
+   if (cpid){//parent
+     printf("%d in sigint",cpid);
+     // signal(SIGINT,handle_sigint);
      wait (&status);
    }
    else
-   {
+   {  printf("%d not in sigint",cpid);
      execvp("play",command);
    }
   }
@@ -151,16 +151,14 @@ while(artistshared[a]){
     command[1]=songs;
     printf("%s",command[1]);
       printf("In here");
-      int cpid = fork();
+      cpid = fork();
       if (cpid){
+        // signal(SIGINT,handle_sigint);
         wait (&status);
         shmd=getNext(shmd);
       }
 
       else{
-        signal(SIGINT, stop_sighandler);
-        signal(SIGSTOP, pause_sighandler);
-        signal(SIGCONT, resume_sighandler);
         execvp("play",command);
     }
   }
