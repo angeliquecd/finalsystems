@@ -2,11 +2,11 @@
 Systems Level Programming Final Project\
 Angelique Charles-Davis (Pd. 5), Lauren Pehlivanian (Pd. 5), Claire Tempelman (Pd. 10)
 Modify your README.md to reflect your actual project, as described on the website:
-Our project allows the user to create and navigate their own music library. The user can populate the library with their
+Our project allows the user to create and navigate their own music library. The user can populate the library with their own songs, add new songs, browse the library and most importantly, play music.
 Required libraries
 -Sox
   apt-get install sox
-  
+
 Instructions
 1. Compile the project by typing make , then run it by typing ./go . You will see a screen prompting you with the various actions you can take with the Library
 3. To start, type POPULATE, in all-caps as shown, and fill in the music library with information about the built-in files. This is a one-time only action. Trying to play or browse without populating the library will result in an empty library.
