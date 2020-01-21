@@ -90,7 +90,10 @@ if (strcmp(s,"PLAY")==0){
   strsep(&sep,"\n");
   printf("You chose: %s\n",s);
 if (strcmp(s,"PLAYLIST")==0){
-
+  printf("Enter the playlist name: ");
+  fgets(s,100,stdin);
+  sep = &s[0];
+  strsep(&sep,"\n");
 }
 if (strcmp(s,"ALBUM")==0){
 
