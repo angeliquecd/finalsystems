@@ -188,7 +188,7 @@ if (strcmp(s,"CREATE")==0){
   printf("\tYour playlist: %s\n", name);
 
   //create file for playlist
-  int fd = open(strcat(name, ".txt"), O_CREAT | 0644, O_APPEND);
+  int fd = open(strcat(name, ".txt"), O_CREAT | O_RDWR, O_APPEND | 0644);
   if (fd < 0) printf("errno %d error: %s\n", errno, strerror(errno));
 
   printf("Playlist '%s' started!\n", name);
