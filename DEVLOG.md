@@ -5,6 +5,9 @@ January 1, 2020:\
 Angelique started the proposal.\
 Claire finished the proposal.\
 \
+January 4,2020:\
+Angelique, Lauren and Claire worked on a project plan on paper
+\
 January 10, 2020:\
 Angelique and Lauren added a basic outline of project.\
 \
@@ -17,7 +20,7 @@ Angelique started shared memory.\
 \
 January 13, 2020:\
 Lauren added sample mp3s.\
-Angelique started shared memory.\
+Angelique worked on shared memory.\
 \
 January 14, 2020:\
 Angelique debugged deletion issues.\
