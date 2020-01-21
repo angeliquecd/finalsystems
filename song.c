@@ -144,7 +144,7 @@ int print_song_shmd(int shmd, int num) {
 int print_list(int shmd, int num) {
   //make new node copy, so as not to modify original pointer.
   struct song_node * newNode = (struct song_node * )shmat(shmd, 0, 0);
-  if (newNode == NULL) {
+  if (newNode == -1) {
     printf("error shmating for shmd=%d\n", shmd);
     return -1;
   }
@@ -179,7 +179,7 @@ char * get_artist(int place) {
   char * out;
   int status;
   struct song_node * first = (struct song_node * ) shmat(artists[place], 0, 0);
-  if (first == NULL) printf("error shamtting: %s", strerror(errno));
+  if (first == -1) printf("error shamtting: %s", strerror(errno));
   printf("\tbucket node: ");
   print_song(first);
   if (first == NULL) {
@@ -189,6 +189,7 @@ char * get_artist(int place) {
   } //else printf("success shmating to get artist!\n");
 
   // return first->artist;
+  printf("\tartist: %s\n", first->artist);
   strcpy(out,first->artist);
   //printf("artist: %s\n", out);
 
@@ -285,11 +286,12 @@ int print_library() {
    int i=0;
   int num=1;
    int shmd;
-  int * artistshared;
+   char * artist;
+   struct song_node * cur;
   // printf("Here");
    shmd=shmget(KEY,TAB_SIZE,0);
    if (shmd<0) printf("Error shmgetting");
-    artistshared=(int *)shmat(shmd,0,0);
+    int * artistshared=(int *)shmat(shmd,0,0);
   if (artistshared<0) printf("Error shmatting");
   // printf("Here");
    //printf("artistshared: %d",artistshared[0]);
@@ -297,7 +299,9 @@ int print_library() {
    //printf("%d",lookat[i]);
    while (lookat[i]){
      //printf("ID is: %d",lookat[i]);
-    printf("BUCKET: %s\n", get_artist(i));
+     cur = (struct song_node *) shmat(lookat[i], 0, 0);
+    printf("BUCKET: %s\n", cur->artist);
+    shmdt(cur);
   //   // printf("shmd: %d\n", artists[i]);
     num = print_list(lookat[i], num);
     i++;

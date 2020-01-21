@@ -207,7 +207,8 @@ if (strcmp(s,"CREATE")==0){
   int status;
   char * path;
   char * input = malloc(10); //user input used throughout.
-  char * done = "n"; //is user done creating playlist ("y" / "n")
+  char * done = malloc(10); //is user done creating playlist ("y" / "n")
+  done = "n";
   //makes a lil shell where you can write to playlists
   //i think we agreed that playlists are text files w a list of song addresses
   printf("Welcome to the playlist maker! Enter the title of your new playlist: ");
@@ -220,7 +221,7 @@ if (strcmp(s,"CREATE")==0){
   printf("\tYour playlist: %s\n", name);
 
   //create file for playlist
-  int fd = open(strcat(name, ".txt"), O_CREAT | O_RDWR, 664);
+  int fd = open(strcat(name, ".txt"), O_CREAT | 0644, O_APPEND);
   if (fd < 0) printf("errno %d error: %s\n", errno, strerror(errno));
 
   printf("Playlist '%s' started!\n", name);
