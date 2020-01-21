@@ -1,21 +1,21 @@
-# finalsystems
+# Music Player
 Systems Level Programming Final Project\
-Angelique Charles-Davis (Pd. 5), Lauren Pehlivanian (Pd. 5), Claire Tempelman (Pd. 10)
-Modify your README.md to reflect your actual project, as described on the website:
-Our project allows the user to create and navigate their own music library. The user can populate the library with their
-Required libraries
--Sox
-  apt-get install sox
+Angelique Charles-Davis (Pd. 5), Lauren Pehlivanian (Pd. 5), Claire Tempelman (Pd. 10)\
+Our project allows the user to create and navigate their own music library. The user can create and play playlists as well.\
+Required libraries\
+-Sox\
+  apt-get install sox\
 Instructions
-1.Compile the project by typing make , then run it by typing ./go . You will see a screen prompting you with the various actions you can take with the Library
-3. To start, type POPULATE, in all-caps as shown, and fill in the music library with information about the built-in files. This is a one-time only action. Trying to play or browse without populating the library will result in an empty library.
-4.You can then choose to browse the library, create a playlist, play music, exit the library or delete it entirely. Follow the prompts to complete each action
-5. When prompted, always type your choice in all-caps as a single word
-  e.g If asked: "Would you like to play a SONG, PLAYLIST, GENRE or ALBUM?"" Type "ALBUM" to play an album.
-6. The only way to change the information about a single song is to repopulate the entire library.
-7. If the library is deleted, it must be repopulated afterwards.
-8. Exiting the program will not delete the library 
-Other information
+1. Compile the project by typing make, then run it by typing ./go. You will see a screen prompting you with the various actions you can take with the Library.
+2. To start, type POPULATE, in all-caps as shown, and fill in the music library with information about the built-in files. This is a one-time only action. Trying to play or browse without populating the library will result in an empty library.
+3. You can then choose to browse the library, create a playlist, play music, exit the library or delete it entirely. Follow the prompts to complete each action
+4. When prompted, always type your choice in all-caps as a single word. (e.g If asked: "Would you like to play a SONG, PLAYLIST, GENRE or ALBUM?"" Type "ALBUM" to play an album.)
+5. The only way to change the information about a single song is to repopulate the entire library.
+6. If the library is deleted, it must be repopulated afterwards.
+7. Exiting the program will not delete the library. Make sure to delete the library first to delete the shared memory segments.
+
+Other information:
+1. Currently we are working on getting rid of a seg fault when the library is populated with more than 2 mp3 files. This has also made testing some of our code difficult.
 
 It should have the following information in the following order:
 Project Name

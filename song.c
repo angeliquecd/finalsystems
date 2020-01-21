@@ -16,10 +16,9 @@
 #define TAB_SIZE sizeof(int)*100
 #define SEG_SIZE sizeof(struct song_node)
 
-int initSong(char pathp[],int i,int max) {
+int initSong(char pathp[150],int i,int max) {
   int shmd, nextshmd;
   struct song_node *data;
-
   shmd=shmget(KEY2+i,SEG_SIZE,0);
 //  printf("Got here.");
     if (shmd<0) printf("Error opening shared memory.");
@@ -27,17 +26,9 @@ int initSong(char pathp[],int i,int max) {
   // data = malloc(sizeof(struct song_node));
   data = (struct song_node *) shmat(shmd,0,0);
   data->next = 0;
-//  printf("The id is: %d\n",shmd);
-// if (max-i>1){
-//   nextshmd=shmget(KEY2+1+i,SEG_SIZE,0);
-//   data->next= nextshmd;
-//
-//
-// }
-//   else data->next = 0;
-//   strncpy(data->path, pathp, 150);//puts path onto shared memory pieces
-// //    printf("%s and %d", data->path,data->next);
-// //  printf("This is in init: %s",data->path);
+  strncpy(data->path, pathp, 150);//puts path onto shared memory pieces
+    printf("%s and %d", data->path,data->next);
+  printf("This is in init: %s",data->path);
 
 //detatch shared memory
   int status = shmdt(data);
@@ -84,7 +75,7 @@ struct song_node * populate_songs(int num) {
     struct dirent * cur = readdir(dir);
 int times=0;
     struct stat * info; //var to store status of each file
-    char fpath[100]; //stores file path
+    char fpath[150]; //stores file path
     //make names into arrays to use with strcpy
     while (cur != NULL) {
     //  while(times<1){
@@ -102,19 +93,12 @@ int times=0;
         // printf("init'ed song w artist=%s\n", cur_song->artist);
         // printf("init'ed song w name=%s\n", cur_song->song_name);
         // printf("init'ed song w next=%d\n", cur_song->next);
-        print_library();
         add_song(shmd);
-        print_library();
-
-        //detatch shared memory
         status = shmdt(cur_song);
         if (status == -1) printf("error shmdting: %s", strerror(errno));
-
-//times++;
   i++;
       }
       cur = readdir(dir);
-  //  }
   }
   //  printf("%p vs. %p",song, data);
     // shmdt(song);
@@ -201,7 +185,8 @@ char * get_artist(int place) {
   if (first == NULL) {
     printf("error shmating for shmd=%d\n", place);
     return out;
-  }
+
+  } //else printf("success shmating to get artist!\n");
 
   // return first->artist;
   strcpy(out,first->artist);
@@ -256,6 +241,22 @@ struct song_node * getNodeFromList(int id, int i, int num) {
 
 //returns song node based on its id.
 //iterates through library same way as print_library().
+
+char * getPath(int place) {
+  char * out="songs/";
+  int status;
+  struct song_node * first = shmat(place, 0, 0);
+  if (first == NULL) {
+    printf("error shmating for shmd=%d\n", place);
+    return out;
+  } //else printf("success shmating to get artist!\n");
+strncpy(out,first->path,100);
+printf("Did it: %s\n",out);
+
+//shmdt(first);
+  //return out;
+//  printf("[]%s %s]",first->path,first->song_name);
+  return out;}
 struct song_node * getNode(int id) {
   char * path;
   int i=0;
@@ -412,3 +413,43 @@ void add_song(int newSongshmd) {
   //free(curSong);
 
 }
+char * get_title(int id){
+  char * out;
+  int status;
+  struct song_node * first = shmat(id, 0, 0);
+  if (first == NULL) {
+    printf("error shmating for shmd=%d\n", id);
+    return out;
+  } //else printf("success shmating to get artist!\n");
+strcpy(out,first->song_name);
+shmdt(first);
+  return out;
+}
+int getNext(int id){
+  int out;
+  int status;
+  struct song_node * first = shmat(id, 0, 0);
+  if (first == NULL) {
+    printf("error shmating for shmd=%d\n", id);
+    return out;
+  } //else printf("success shmating to get artist!\n");
+out=first->next;
+shmdt(first);
+  return out;
+}
+char * searchsongs(char * artist, char * title){
+  int i;
+  int shmd=shmget(KEY,TAB_SIZE,0);
+  int * artistshared=shmat(shmd,0,0);
+  while (artistshared[i]){
+    struct song_node * newNode=shmat(artistshared[i],0,0);
+    while (newNode!=NULL && strcpy(artist,get_artist(artistshared[i]))==0){
+      if (strcpy(newNode->song_name,title)==0){
+        return getPath(artistshared[i]);
+      }
+      newNode=shmat(newNode->next,0,0);
+    }
+  i++;
+    }
+    return "hi";
+  }

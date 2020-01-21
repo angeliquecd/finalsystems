@@ -13,12 +13,14 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include <signal.h>
 // #include "songLibrary.c"
 #include "song.c"
 #define KEY2 1232
 #define KEY 10001
 #define TAB_SIZE sizeof(int)*100
 #define SEG_SIZE sizeof(struct song_node)
+int cpid;
 //this is what executes at runtime
 int initmem(){
   int i=0;
@@ -42,6 +44,18 @@ int initmem(){
   }
   shmget(KEY,TAB_SIZE, IPC_CREAT | 0644);
   return i;
+}
+static void stop_sighandler(int signo){
+  printf("Stopping player.\n");
+  kill(cpid, 9);
+}
+static void pause_sighandler(int signo){
+  printf("Pausing player.\n");
+  kill(cpid, SIGSTOP);
+}
+static void resume_sighandler(int signo){
+  printf("Resuming player.\n");
+  kill(cpid, SIGCONT);
 }
 
 int main(int argc, char *argsv[]){
@@ -67,29 +81,14 @@ i=initmem();
   sep = &s[0];
   printf("You chose: %s\n",strsep(&sep,"\n"));
 if (strcmp(s,"PLAY")==0){
-  printf("\nWould you like to play a song, genre, album, artist or playlist?\n");
+  char play[100] ="play ";
+  char ** command=malloc(200);
+  command[0]="play";
+  printf("\nWould you like to play a SONG, GENRE, ALBUM, ARTIST or PLAYLIST?\n");
   //i think we can take out the possibility of songs w the same name as the album and artists w the same name as the song
   fgets(s,100,stdin);
   strsep(&sep,"\n");
   printf("You chose: %s\n",s);
-  // if (strcmp(s,"SONG")==0){
-  //   printf("Type the name and artist of the song you would like to play.\n");
-  //   char * path;
-  //   char * song;
-  //   fgets(song,100, stdin);
-  // //  path= searchsongs(song); //will return the path, null if there is no such song
-  // // if path!=NULL then
-  // f=fork();
-  // if (f){
-  //   wait(&status);
-  // }
-  // else{
-  //   char * commands[];
-  //   comands[0]="play";
-  //   commands[1]=path;
-  //   execvp("play",commands);
-  // }
-  // }
 if (strcmp(s,"PLAYLIST")==0){
 
 }
@@ -100,7 +99,42 @@ if (strcmp(s,"GENRE")==0){
 
 }
 if (strcmp(s,"ARTIST")==0){
+  int f,status;
+  printf("Enter the artist name: ");
+  fgets(s,100,stdin);
+  sep = &s[0];
+  strsep(&sep,"\n");
+  int a=0;
+  int shmd=shmget(KEY,TAB_SIZE,0);
+  int * artistshared;
+artistshared=shmat(shmd,0,0);
+  printf("%d",artistshared[a]);
+   while(artistshared[a]){
+//   //  printf("%s vs. ",s);
+//   //  printf("%s\n",get_artist(artistshared[a]));
+     if (strcmp(s,get_artist(artistshared[a]))==0){
+       char * path=getPath(artistshared[a]);
+//printf("path: %s",path);
+char songs[100]="songs/";
+  strcat(songs,path);
+  printf("songs: %s",songs);
+    command[1]=songs;
+    printf("%s",command[1]);
+      printf("In here");
+      int cpid = fork();
+      if (cpid){
+        wait (&status);
+      }
+      else{
+        signal(SIGINT, stop_sighandler);
+        signal(SIGSTOP, pause_sighandler);
+        signal(SIGCONT, resume_sighandler);
+        execvp("play",command);
+    }
   }
+    a++;
+  }
+}
 }
 if (strcmp(s,"POPULATE")==0){
   //printf("Song library: ");
@@ -135,15 +169,14 @@ print_library();
 
 }
 if (strcmp(s,"CREATE")==0){
-  //makes a lil shell where you can write to playlists
-  //i think we agreed that playlists are text files w a list of song addresses
   int num; //represents number of songs in library
   int id; //song id user chooses to add to playlist
   int status;
   char * path;
   char * input = malloc(10); //user input used throughout.
   char * done = "n"; //is user done creating playlist ("y" / "n")
-
+  //makes a lil shell where you can write to playlists
+  //i think we agreed that playlists are text files w a list of song addresses
   printf("Welcome to the playlist maker! Enter the title of your new playlist: ");
   //get name of playlist
   char name[100];
@@ -151,6 +184,7 @@ if (strcmp(s,"CREATE")==0){
   fgets(name,100,stdin);
   sep = &name[0];
   strsep(&sep,"\n");
+  printf("\tYour playlist: %s\n", name);
 
   //create file for playlist
   int fd = open(strcat(name, ".txt"), O_CREAT | O_RDWR, 664);
@@ -190,8 +224,6 @@ if (strcmp(s,"CREATE")==0){
     fgets(done,100,stdin);
     done = strsep(&done,"\n");
   }
-  // searchsongs(song);
-  free(input);
 
 }
 if (strcmp(s,"DELETE")==0){
