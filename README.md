@@ -1,7 +1,7 @@
 # Music Player
 Systems Level Programming Final Project\
 Angelique Charles-Davis (Pd. 5), Lauren Pehlivanian (Pd. 5), Claire Tempelman (Pd. 10)\
-Our project allows the user to create and navigate their own music library.\
+Our project allows the user to create and navigate their own music library. The user can create and play playlists as well.\
 Required libraries\
 -Sox\
   apt-get install sox\
@@ -14,7 +14,8 @@ Instructions
 6. If the library is deleted, it must be repopulated afterwards.
 7. Exiting the program will not delete the library. Make sure to delete the library first to delete the shared memory segments.
 
-Other information
+Other information:
+1. Currently we are working on getting rid of a seg fault when the library is populated with more than 2 mp3 files. This has also made testing some of our code difficult.
 
 It should have the following information in the following order:
 Project Name
