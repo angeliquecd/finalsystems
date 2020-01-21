@@ -232,7 +232,7 @@ struct song_node * getNodeFromList(int id, int i, int num) {
 //iterates through library same way as print_library().
 
 char * getPath(int place) {
-  char out[100]="songs/";
+  char * out="songs/";
   int status;
   struct song_node * first = shmat(place, 0, 0);
   if (first == NULL) {
@@ -403,7 +403,7 @@ void add_song(int newSongshmd) {
 
 }
 char * get_title(int id){
-  char out[100];
+  char * out;
   int status;
   struct song_node * first = shmat(id, 0, 0);
   if (first == NULL) {
