@@ -130,7 +130,25 @@ if (strcmp(s,"SONG")==0){
 }
   }
 if (strcmp(s,"PLAYLIST")==0){
-
+  printf("Enter the playlist name: ");
+  fgets(s,100,stdin);
+  sep = &s[0];
+  strsep(&sep,"\n");
+  int fd = open(strcat(s, ".txt"), O_RDONLY);
+  char * buff;
+  read(fd,buff,1000);
+  strsep(buff,'\n');//put in one of those loops from shell project that strseps and goes one by one
+  command[1]=buff;
+  cpid=fork();
+  if (cpid){//parent
+    printf("%d in sigint",cpid);
+    // signal(SIGINT,handle_sigint);
+    wait (&status);
+  }
+  else
+  {  printf("%d not in sigint",cpid);
+    execvp("play",command);
+  }
 }
 if (strcmp(s,"ARTIST")==0){
   printf("Enter the artist name: ");
@@ -250,6 +268,7 @@ if (strcmp(s,"CREATE")==0){
       // sprintf(input, "%d", id);
       // status = write(fd, input, sizeof(input));
       path = getNode(id)->path; // <- doesn't work but eventually will be code to get the path based on id
+      strcat(path,"\n");
       status = write(fd, path, sizeof(path));
       if (status == 0) printf("errno %d error: %s\n", errno, strerror(errno));
     }
