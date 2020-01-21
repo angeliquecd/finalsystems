@@ -184,6 +184,7 @@ char * get_artist(int place) {
   char * out;
   int status;
   struct song_node * first = (struct song_node * ) shmat(artists[place], 0, 0);
+  if (first == NULL) printf("error shamtting: %s", strerror(errno));
   printf("\tbucket node: ");
   print_song(first);
   if (first == NULL) {
