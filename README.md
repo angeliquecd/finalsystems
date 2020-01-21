@@ -20,4 +20,4 @@ Instructions
 9. Exiting the program will not delete the library
 
 Other information:
-1. Currently we are working on getting rid of a seg fault when the library is populated with more than 2 mp3 files. This has also made testing some of our code difficult.
+1. Currently we are working on getting rid of a seg fault when music is played. We all have been working on macs and the seg fault does not occur at all on a mac. We are trying to figure out why the discrepancy exists.
