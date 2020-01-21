@@ -85,6 +85,7 @@ if (strcmp(s,"GENRE")==0){
 
 }
 if (strcmp(s,"ARTIST")==0){
+  int f,status;
   printf("Enter the artist name: ");
   fgets(s,100,stdin);
   sep = &s[0];
@@ -106,8 +107,14 @@ char songs[100]="songs/";
     command[1]=songs;
     printf("%s",command[1]);
       printf("In here");
-       execvp("play",command);
+      f=fork();
+      if (f){
+        wait (&status);
+      }
+      else{
+           execvp("play",command);
     }
+  }
     a++;
   }
 }
