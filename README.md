@@ -5,7 +5,7 @@ Our project allows the user to create and navigate their own music library.
 Required libraries\
 -Sox\
   apt-get install sox\
-Instructions\
+Instructions
 1. Compile the project by typing make, then run it by typing ./go. You will see a screen prompting you with the various actions you can take with the Library.
 2. To start, type POPULATE, in all-caps as shown, and fill in the music library with information about the built-in files. This is a one-time only action. Trying to play or browse without populating the library will result in an empty library.
 3. You can then choose to browse the library, create a playlist, play music, exit the library or delete it entirely. Follow the prompts to complete each action
