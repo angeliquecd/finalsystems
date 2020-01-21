@@ -144,7 +144,7 @@ int print_song_shmd(int shmd, int num) {
 int print_list(int shmd, int num) {
   //make new node copy, so as not to modify original pointer.
   struct song_node * newNode = (struct song_node * )shmat(shmd, 0, 0);
-  if (newNode == -1) {
+  if (newNode == NULL) {
     printf("error shmating for shmd=%d\n", shmd);
     return -1;
   }
@@ -179,7 +179,7 @@ char * get_artist(int place) {
   char * out;
   int status;
   struct song_node * first = (struct song_node * ) shmat(place, 0, 0);
-  if (first == -1) printf("error shamtting: %s", strerror(errno));
+  if (first == NULL) printf("error shamtting: %s", strerror(errno));
   printf("\tbucket node: ");
   print_song(first);
   if (first == NULL) {

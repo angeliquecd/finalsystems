@@ -137,7 +137,7 @@ if (strcmp(s,"PLAYLIST")==0){
   int fd = open(strcat(s, ".txt"), O_RDONLY);
   char * buff;
   read(fd,buff,1000);
-  strsep(buff,'\n');//put in one of those loops from shell project that strseps and goes one by one
+  strsep(&buff,"\n");//put in one of those loops from shell project that strseps and goes one by one
   command[1]=buff;
   cpid=fork();
   if (cpid){//parent
