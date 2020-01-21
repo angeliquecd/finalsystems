@@ -48,8 +48,19 @@ int initSong(char pathp[],int i,int max) {
 
 void clear_library(){
   int i=0;
+  int temp_shmid;
+  struct song_node * cur;
   while(artists[i]) {
-    shmctl(artists[i], IPC_RMID, NULL);
+    temp_shmid = artists[i];
+    cur = shmat(artists[i], 0, 0);
+    while (cur->next){
+      printf("\tREMOVING %d\n", temp_shmid);
+      shmdt(cur);
+      shmctl(temp_shmid, IPC_RMID, NULL);
+      cur = shmat(cur->next, 0, 0);
+      temp_shmid = cur->next;
+    }
+    //shmctl(artists[i], IPC_RMID, NULL);
     i++;
   }
 }
@@ -367,7 +378,7 @@ void add_song(int newSongshmd) {
     //printf("shmd = %d. artist here: %s", artists[i], get_artist(i));
     shmd2 = artists[i];
     curSong = (struct song_node * )shmat(shmd2,0,0);
-    if (curSong == NULL) printf("error shmating. %s\n", strerror(errno));
+    if (curSong == -1) printf("error shmating. %s\n", strerror(errno));
     //printf("\tchecking \n");
     //print_song(curSong);
     //found album!
@@ -379,7 +390,7 @@ void add_song(int newSongshmd) {
       //loop until end of songs in album to place new song
       while(curSong->next) {
         shmd2 = curSong->next;
-        status = shmdt(curSong) ;
+        status = shmdt(curSong);
         if (status == -1) printf("0error shmdting: %s", strerror(errno));
         curSong = (struct song_node * ) shmat(shmd2, 0, 0);
       }
