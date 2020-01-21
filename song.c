@@ -286,11 +286,10 @@ int print_library() {
    int shmd;
    char * artist;
    struct song_node * cur;
-  int * artistshared;
   // printf("Here");
    shmd=shmget(KEY,TAB_SIZE,0);
    if (shmd<0) printf("Error shmgetting");
-    artistshared=(int *)shmat(shmd,0,0);
+    int * artistshared=(int *)shmat(shmd,0,0);
   if (artistshared<0) printf("Error shmatting");
   // printf("Here");
    //printf("artistshared: %d",artistshared[0]);
