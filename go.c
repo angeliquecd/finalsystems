@@ -182,7 +182,8 @@ if (strcmp(s,"CREATE")==0){
     else {
       // sprintf(input, "%d", id);
       // status = write(fd, input, sizeof(input));
-      path = getPath(id);
+      path = getNode(id)->path; // <- doesn't work but eventually will be code to get the path based on id
+      status = write(fd, path, sizeof(path));
       if (status == 0) printf("errno %d error: %s\n", errno, strerror(errno));
     }
     printf("Are you done building the playlist? y/n ");
