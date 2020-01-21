@@ -140,9 +140,9 @@ if (strcmp(s,"ARTIST")==0){
   printf("%d",artistshared[a]);
 while(artistshared[a]){
 //   //  printf("%s vs. ",s);
-  printf("%s\n",get_artist(artistshared[a]));
-if (strcmp(s,get_artist(artistshared[a]))==0){
-  shmd=artistshared[a];
+//   printf("%s\n",get_artist(artistshared[a]));
+ if (strcmp(s,get_artist(artistshared[a]))==0){
+   shmd=artistshared[a];
   while(shmd){
        char * path=getPath(shmd);
 //printf("path: %s",path);
@@ -164,7 +164,8 @@ if (strcmp(s,get_artist(artistshared[a]))==0){
         execvp("play",command);
     }
   }
-}
+printf("%d",shmd);
+ }
     a++;
   }
 }

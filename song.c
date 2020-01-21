@@ -178,7 +178,7 @@ int print_list(int shmd, int num) {
 char * get_artist(int place) {
   char * out;
   int status;
-  struct song_node * first = (struct song_node * ) shmat(artists[place], 0, 0);
+  struct song_node * first = (struct song_node * ) shmat(place, 0, 0);
   if (first == -1) printf("error shamtting: %s", strerror(errno));
   printf("\tbucket node: ");
   print_song(first);
@@ -432,6 +432,7 @@ shmdt(first);
 printf("Get title returning: %s",out);
   return out;
 }
+
 int getNext(int id){
   int out;
   int status;
@@ -445,6 +446,7 @@ shmdt(first);
 printf("Get next returning: %d",out);
   return out;
 }
+
 char * searchsongs(char * artist, char * title){
   int i;
   int shmd=shmget(KEY,TAB_SIZE,0);
