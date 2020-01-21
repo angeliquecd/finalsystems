@@ -1,7 +1,7 @@
 # finalsystems
 Systems Level Programming Final Project\
 Angelique Charles-Davis (Pd. 5), Lauren Pehlivanian (Pd. 5), Claire Tempelman (Pd. 10)\
-Our project allows the user to create and navigate their own music library.
+Our project allows the user to create and navigate their own music library.\
 Required libraries\
 -Sox\
   apt-get install sox\
