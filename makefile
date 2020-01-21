@@ -1,2 +1,2 @@
 all: go.c
-	gcc -o go go.c
+	gcc -g -o go go.c
