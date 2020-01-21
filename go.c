@@ -20,7 +20,7 @@
 #define KEY 10001
 #define TAB_SIZE sizeof(int)*100
 #define SEG_SIZE sizeof(struct song_node)
-int cpid;
+pid_t cpid;
 //this is what executes at runtime
 int initmem(){
   int i=0;
@@ -36,8 +36,6 @@ int initmem(){
   while (cur != NULL) {
     if (cur->d_type != DT_DIR) {
         shmd=shmget(KEY2+i,SEG_SIZE, IPC_CREAT | 0644);
-      //  printf("Id created: %d\n",shmd);
-    //    printf("I is: %d\n",i);
           i++;
     }
     cur = readdir(dir);
@@ -45,17 +43,19 @@ int initmem(){
   shmget(KEY,TAB_SIZE, IPC_CREAT | 0644);
   return i;
 }
-static void stop_sighandler(int signo){
-  printf("Stopping player.\n");
-  kill(cpid, 9);
-}
-static void pause_sighandler(int signo){
-  printf("Pausing player.\n");
-  kill(cpid, SIGSTOP);
-}
-static void resume_sighandler(int signo){
-  printf("Resuming player.\n");
-  kill(cpid, SIGCONT);
+static void handle_sigint(int signo){
+  printf("Signal is: %d",signo);
+  if (signo==2)
+  {printf("Stopping player.\n");
+  kill(cpid, 9);}
+  if (signo==SIGSTOP){
+    printf("Pausing player.\n");
+    kill(cpid, SIGSTOP);
+  }
+  if (signo==SIGCONT){
+    printf("Resuming player.\n");
+    kill(cpid, SIGCONT);
+  }
 }
 
 int main(int argc, char *argsv[]){
@@ -81,57 +81,107 @@ i=initmem();
   sep = &s[0];
   printf("You chose: %s\n",strsep(&sep,"\n"));
 if (strcmp(s,"PLAY")==0){
+  int f, status;
   char play[100] ="play ";
   char ** command=malloc(200);
   command[0]="play";
-  printf("\nWould you like to play a SONG, GENRE, ALBUM, ARTIST or PLAYLIST?\n");
+  char songs[100]="songs/";
+  int a =0;
+  int shmd=shmget(KEY,TAB_SIZE,0);
+  int * artistshared;
+artistshared=shmat(shmd,0,0);
+  printf("\nWould you like to play a SONG, ARTIST or PLAYLIST?\n");
   //i think we can take out the possibility of songs w the same name as the album and artists w the same name as the song
   fgets(s,100,stdin);
+  sep = &s[0];
   strsep(&sep,"\n");
-  printf("You chose: %s\n",s);
+  printf("You chose: [%s]\n",s);
+if (strcmp(s,"SONG")==0){
+  printf("Enter the song name: ");
+  fgets(s,100,stdin);
+  sep = &s[0];
+  strsep(&sep,"\n");
+  printf("%d",artistshared[a]);
+  while(artistshared[a]){
+  shmd=artistshared[a];
+  while (shmd){
+  if (strcmp(s,get_title(shmd))==0){
+    printf("In here.\n");
+    char * path=getPath(shmd);
+    strcat(songs,path);
+    printf("songs: %s",songs);
+ command[1]=songs;
+ printf("%s",command[1]);
+   cpid=fork();
+   if (cpid){//parent
+     printf("%d in sigint",cpid);
+     // signal(SIGINT,handle_sigint);
+     wait (&status);
+   }
+   else
+   {  printf("%d not in sigint",cpid);
+     execvp("play",command);
+   }
+  }
+  shmd=getNext(shmd);
+  }
+  a++;
+  printf("Number: %d",artistshared[a]);
+}
+  }
 if (strcmp(s,"PLAYLIST")==0){
-
-}
-if (strcmp(s,"ALBUM")==0){
-
-}
-if (strcmp(s,"GENRE")==0){
-
+  printf("Enter the playlist name: ");
+  fgets(s,100,stdin);
+  sep = &s[0];
+  strsep(&sep,"\n");
+  int fd = open(strcat(s, ".txt"), O_RDONLY);
+  char * buff;
+  read(fd,buff,1000);
+  strsep(&buff,"\n");//put in one of those loops from shell project that strseps and goes one by one
+  command[1]=buff;
+  cpid=fork();
+  if (cpid){//parent
+    printf("%d in sigint",cpid);
+    // signal(SIGINT,handle_sigint);
+    wait (&status);
+  }
+  else
+  {  printf("%d not in sigint",cpid);
+    execvp("play",command);
+  }
 }
 if (strcmp(s,"ARTIST")==0){
-  int f,status;
   printf("Enter the artist name: ");
   fgets(s,100,stdin);
   sep = &s[0];
   strsep(&sep,"\n");
-  int a=0;
-  int shmd=shmget(KEY,TAB_SIZE,0);
-  int * artistshared;
-artistshared=shmat(shmd,0,0);
   printf("%d",artistshared[a]);
-   while(artistshared[a]){
+while(artistshared[a]){
 //   //  printf("%s vs. ",s);
-//   //  printf("%s\n",get_artist(artistshared[a]));
-     if (strcmp(s,get_artist(artistshared[a]))==0){
-       char * path=getPath(artistshared[a]);
+//   printf("%s\n",get_artist(artistshared[a]));
+ if (strcmp(s,get_artist(artistshared[a]))==0){
+   shmd=artistshared[a];
+  while(shmd){
+       char * path=getPath(shmd);
 //printf("path: %s",path);
-char songs[100]="songs/";
   strcat(songs,path);
   printf("songs: %s",songs);
     command[1]=songs;
     printf("%s",command[1]);
       printf("In here");
-      int cpid = fork();
+      cpid = fork();
       if (cpid){
+        // signal(SIGINT,handle_sigint);
         wait (&status);
+        shmd=getNext(shmd);
       }
+
       else{
-        signal(SIGINT, stop_sighandler);
-        signal(SIGSTOP, pause_sighandler);
-        signal(SIGCONT, resume_sighandler);
         execvp("play",command);
     }
   }
+printf("%d",shmd);
+ }
     a++;
   }
 }
@@ -218,6 +268,7 @@ if (strcmp(s,"CREATE")==0){
       // sprintf(input, "%d", id);
       // status = write(fd, input, sizeof(input));
       path = getNode(id)->path; // <- doesn't work but eventually will be code to get the path based on id
+      strcat(path,"\n");
       status = write(fd, path, sizeof(path));
       if (status == 0) printf("errno %d error: %s\n", errno, strerror(errno));
     }
