@@ -100,9 +100,13 @@ artistshared=shmat(shmd,0,0);
      if (strcmp(s,get_artist(artistshared[a]))==0){
        char * path=getPath(artistshared[a]);
 //printf("path: %s",path);
-  //  command[1]=path;
+char songs[100]="songs/";
+  strcat(songs,path);
+  printf("songs: %s",songs);
+    command[1]=songs;
+    printf("%s",command[1]);
       printf("In here");
-    //   execvp("play",command);
+       execvp("play",command);
     }
     a++;
   }
