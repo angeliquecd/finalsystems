@@ -13,12 +13,14 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include <signal.h>
 // #include "songLibrary.c"
 #include "song.c"
 #define KEY2 1232
 #define KEY 10001
 #define TAB_SIZE sizeof(int)*100
 #define SEG_SIZE sizeof(struct song_node)
+int cpid;
 //this is what executes at runtime
 int initmem(){
   int i=0;
@@ -42,6 +44,18 @@ int initmem(){
   }
   shmget(KEY,TAB_SIZE, IPC_CREAT | 0644);
   return i;
+}
+static void stop_sighandler(int signo){
+  printf("Stopping player.\n");
+  kill(cpid, 9);
+}
+static void pause_sighandler(int signo){
+  printf("Pausing player.\n");
+  kill(cpid, SIGSTOP);
+}
+static void resume_sighandler(int signo){
+  printf("Resuming player.\n");
+  kill(cpid, SIGCONT);
 }
 
 int main(int argc, char *argsv[]){
@@ -107,12 +121,15 @@ char songs[100]="songs/";
     command[1]=songs;
     printf("%s",command[1]);
       printf("In here");
-      f=fork();
-      if (f){
+      int cpid = fork();
+      if (cpid){
         wait (&status);
       }
       else{
-           execvp("play",command);
+        signal(SIGINT, stop_sighandler);
+        signal(SIGSTOP, pause_sighandler);
+        signal(SIGCONT, resume_sighandler);
+        execvp("play",command);
     }
   }
     a++;
