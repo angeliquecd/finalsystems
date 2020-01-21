@@ -39,8 +39,19 @@ int initSong(char pathp[150],int i,int max) {
 
 void clear_library(){
   int i=0;
+  int temp_shmid;
+  struct song_node * cur;
   while(artists[i]) {
-    shmctl(artists[i], IPC_RMID, NULL);
+    temp_shmid = artists[i];
+    cur = shmat(artists[i], 0, 0);
+    while (cur->next){
+      printf("\tREMOVING %d\n", temp_shmid);
+      shmdt(cur);
+      shmctl(temp_shmid, IPC_RMID, NULL);
+      cur = shmat(cur->next, 0, 0);
+      temp_shmid = cur->next;
+    }
+    //shmctl(artists[i], IPC_RMID, NULL);
     i++;
   }
 }
@@ -232,20 +243,22 @@ struct song_node * getNodeFromList(int id, int i, int num) {
 //iterates through library same way as print_library().
 
 char * getPath(int place) {
-  char out[100]="songs/";
+  char * out;
   int status;
+  printf("Get path starting");
   struct song_node * first = shmat(place, 0, 0);
   if (first == NULL) {
     printf("error shmating for shmd=%d\n", place);
     return out;
   } //else printf("success shmating to get artist!\n");
-strncpy(out,first->path,100);
-printf("Did it: %s\n",out);
+out=first->path;
+printf("Get path returning: %s\n",out);
 
 //shmdt(first);
   //return out;
 //  printf("[]%s %s]",first->path,first->song_name);
   return out;}
+
 struct song_node * getNode(int id) {
   char * path;
   int i=0;
@@ -380,7 +393,7 @@ void add_song(int newSongshmd) {
       //loop until end of songs in album to place new song
       while(curSong->next) {
         shmd2 = curSong->next;
-        status = shmdt(curSong) ;
+        status = shmdt(curSong);
         if (status == -1) printf("0error shmdting: %s", strerror(errno));
         curSong = (struct song_node * ) shmat(shmd2, 0, 0);
       }
@@ -403,7 +416,7 @@ void add_song(int newSongshmd) {
 
 }
 char * get_title(int id){
-  char out[100];
+  char * out;
   int status;
   struct song_node * first = shmat(id, 0, 0);
   if (first == NULL) {
@@ -412,6 +425,7 @@ char * get_title(int id){
   } //else printf("success shmating to get artist!\n");
 strcpy(out,first->song_name);
 shmdt(first);
+printf("Get title returning: %s",out);
   return out;
 }
 int getNext(int id){
@@ -424,6 +438,7 @@ int getNext(int id){
   } //else printf("success shmating to get artist!\n");
 out=first->next;
 shmdt(first);
+printf("Get next returning: %d",out);
   return out;
 }
 char * searchsongs(char * artist, char * title){

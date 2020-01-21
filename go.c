@@ -20,6 +20,7 @@
 #define KEY 10001
 #define TAB_SIZE sizeof(int)*100
 #define SEG_SIZE sizeof(struct song_node)
+int cpid;
 //this is what executes at runtime
 int initmem(){
   int i=0;
@@ -42,9 +43,22 @@ int initmem(){
   shmget(KEY,TAB_SIZE, IPC_CREAT | 0644);
   return i;
 }
-void handle_sigint(int sig) {
-    printf("Caught signal %d\n", sig);
+static void handle_sigint(int signo){
+  printf("Signal is: %d",signo);
 }
+static void stop_sighandler(int signo){
+  printf("Stopping player.\n");
+  kill(cpid, 9);
+}
+static void pause_sighandler(int signo){
+  printf("Pausing player.\n");
+  kill(cpid, SIGSTOP);
+}
+static void resume_sighandler(int signo){
+  printf("Resuming player.\n");
+  kill(cpid, SIGCONT);
+}
+
 int main(int argc, char *argsv[]){
   int shmd, q;
   int i=0;
@@ -74,25 +88,26 @@ if (strcmp(s,"PLAY")==0){
   command[0]="play";
   char songs[100]="songs/";
   int a =0;
+  int shmd=shmget(KEY,TAB_SIZE,0);
+  int * artistshared;
+artistshared=shmat(shmd,0,0);
   printf("\nWould you like to play a SONG, ARTIST or PLAYLIST?\n");
   //i think we can take out the possibility of songs w the same name as the album and artists w the same name as the song
   fgets(s,100,stdin);
+  sep = &s[0];
   strsep(&sep,"\n");
-  printf("You chose: %s\n",s);
-
+  printf("You chose: [%s]\n",s);
 if (strcmp(s,"SONG")==0){
   printf("Enter the song name: ");
   fgets(s,100,stdin);
   sep = &s[0];
   strsep(&sep,"\n");
-  int shmd=shmget(KEY,TAB_SIZE,0);
-  int * artistshared;
-artistshared=shmat(shmd,0,0);
   printf("%d",artistshared[a]);
 while(artistshared[a]){
   shmd=artistshared[a];
   while (shmd){
   if (strcmp(s,get_title(shmd))==0){
+    printf("In here.\n");
     char * path=getPath(shmd);
     strcat(songs,path);
     printf("songs: %s",songs);
@@ -111,28 +126,21 @@ while(artistshared[a]){
   shmd=getNext(shmd);
   }
   a++;
+  printf("Number: %d",artistshared[a]);
 }
   }
 if (strcmp(s,"PLAYLIST")==0){
 
 }
-if (strcmp(s,"ALBUM")==0){
-}
-if (strcmp(s,"GENRE")==0){
-}
-
 if (strcmp(s,"ARTIST")==0){
   printf("Enter the artist name: ");
   fgets(s,100,stdin);
   sep = &s[0];
   strsep(&sep,"\n");
-  int shmd=shmget(KEY,TAB_SIZE,0);
-  int * artistshared;
-artistshared=shmat(shmd,0,0);
   printf("%d",artistshared[a]);
 while(artistshared[a]){
 //   //  printf("%s vs. ",s);
-//   //  printf("%s\n",get_artist(artistshared[a]));
+  printf("%s\n",get_artist(artistshared[a]));
 if (strcmp(s,get_artist(artistshared[a]))==0){
   shmd=artistshared[a];
   while(shmd){
@@ -142,12 +150,19 @@ if (strcmp(s,get_artist(artistshared[a]))==0){
   printf("songs: %s",songs);
     command[1]=songs;
     printf("%s",command[1]);
-      f=fork();
-      if (f){
+      printf("In here");
+      int cpid = fork();
+      if (cpid){
         wait (&status);
         shmd=getNext(shmd);
       }
-      else execvp("play",command);
+
+      else{
+        signal(SIGINT, stop_sighandler);
+        signal(SIGSTOP, pause_sighandler);
+        signal(SIGCONT, resume_sighandler);
+        execvp("play",command);
+    }
   }
 }
     a++;

@@ -1,8 +1,9 @@
-# finalsystems
-Systems Level Programming Final Project\
+# Music Player
+Systems Level Programming Final Project
 Angelique Charles-Davis (Pd. 5), Lauren Pehlivanian (Pd. 5), Claire Tempelman (Pd. 10)
-Modify your README.md to reflect your actual project, as described on the website:
+
 Our project allows the user to create and navigate their own music library. The user can populate the library with their own songs, add new songs, browse the library and most importantly, play music.
+
 Required libraries
 -Sox
   apt-get install sox
@@ -17,13 +18,6 @@ Instructions
 7. The only way to change the information about a single song is to repopulate the entire library.
 8. If the library is deleted, it must be repopulated afterwards.
 9. Exiting the program will not delete the library
-Other information
 
-It should have the following information in the following order:
-Project Name
-Team Members and class period(s)
-Broad description of project
-List of any required libraries
-Include apt-get instructions on how to install the libraries
-Instructions on how to use your project
-Other information you deem important (known bugs, work citation, etc.)
+Other information:
+1. Currently we are working on getting rid of a seg fault when the library is populated with more than 2 mp3 files. This has also made testing some of our code difficult.
