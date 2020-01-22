@@ -267,7 +267,7 @@ if (strcmp(s,"CREATE")==0){
     else {
       // sprintf(input, "%d", id);
       // status = write(fd, input, sizeof(input));
-      path = getNode(id)->path; // <- doesn't work but eventually will be code to get the path based on id
+      path = getNthNode(id)->path; // <- doesn't work but eventually will be code to get the path based on id
       strcat(path,"\n");
       status = write(fd, path, sizeof(path));
       if (status == 0) printf("errno %d error: %s\n", errno, strerror(errno));
