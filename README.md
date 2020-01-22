@@ -19,5 +19,5 @@ Instructions
 8. If the library is deleted, it must be repopulated afterwards.
 9. Exiting the program will not delete the library
 
-Other information:
-1. Currently we are working on getting rid of a seg fault when music is played. We all have been working on macs and the seg fault does not occur at all on a mac. We are trying to figure out why the discrepancy exists.
+Bugs:
+1. After you delete the library, you can't repopulate it. You must exit and start the program again.
