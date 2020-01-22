@@ -43,19 +43,20 @@ int initmem(){
   shmget(KEY,TAB_SIZE, IPC_CREAT | 0644);
   return i;
 }
-static void handle_sigint(int signo){
+static void handle_sig(int signo){
   printf("Signal is: %d",signo);
-  if (signo==2)
+  if (signo==SIGINT)
   {printf("Stopping player.\n");
-  kill(cpid, 9);}
+  //kill(cpid, 9);}
   if (signo==SIGSTOP){
     printf("Pausing player.\n");
-    kill(cpid, SIGSTOP);
+    //kill(cpid, SIGSTOP);
   }
   if (signo==SIGCONT){
     printf("Resuming player.\n");
-    kill(cpid, SIGCONT);
+    //kill(cpid, SIGCONT);
   }
+}
 }
 
 int main(int argc, char *argsv[]){
@@ -115,7 +116,7 @@ if (strcmp(s,"SONG")==0){
    cpid=fork();
    if (cpid){//parent
      printf("%d in sigint",cpid);
-     // signal(SIGINT,handle_sigint);
+     signal(SIGINT,handle_sig);
      wait (&status);
    }
    else
@@ -142,7 +143,7 @@ if (strcmp(s,"PLAYLIST")==0){
   cpid=fork();
   if (cpid){//parent
     printf("%d in sigint",cpid);
-    // signal(SIGINT,handle_sigint);
+    signal(SIGINT,handle_sig);
     wait (&status);
   }
   else
@@ -171,7 +172,7 @@ while(artistshared[a]){
       printf("In here");
       cpid = fork();
       if (cpid){
-        // signal(SIGINT,handle_sigint);
+        signal(SIGINT,handle_sig);
         wait (&status);
         shmd=getNext(shmd);
       }
