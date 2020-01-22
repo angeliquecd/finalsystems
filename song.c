@@ -314,7 +314,7 @@ struct song_node * getNthNode(int n) {
     printf("num: %d\n", num);
     //printf("checking bucket %d | num = %d\n", i, num );
     curSong = (struct song_node * )shmat(artistshared[i], 0, 0);
-    if (curSong == -1) printf("error shmatting: %s", strerror(errno));
+    if (!curSong) printf("error shmatting: %s", strerror(errno));
     //there is a next song linked to current song: increment num
     //printf("hi\n");
     //print_song(curSong);
@@ -498,7 +498,7 @@ void add_song(int newSongshmd) {
     //printf("shmd = %d. artist here: %s", artists[i], get_artist(i));
     shmd2 = artistshared[i];
     curSong = (struct song_node * )shmat(shmd2,0,0);
-    if (curSong == -1) printf("error shmating. %s\n", strerror(errno));
+    if (!curSong) printf("error shmating. %s\n", strerror(errno));
     //printf("\tchecking \n");
     //print_song(curSong);
     //found album!

@@ -176,10 +176,10 @@ if (strcmp(s,"PLAYLIST")==0){
   strsep(&sep,"\n");
   int fd = open(strcat(s, ".txt"), O_RDONLY);
   if (!fd) printf("error opening %s: %s", s, strerror(errno));
-  printf("opening: %s\n", s);
+//  printf("opening: %s\n", s);
   char * buff = malloc(1000);
   int status = read(fd, buff, 1000);
-  printf("all files: %s\n", buff);
+//  printf("all files: %s\n", buff);
   //separate all files by \n, store in fpaths
   i=0;
   char * token;
@@ -228,7 +228,7 @@ if (strcmp(s,"ARTIST")==0){
   fgets(s,100,stdin);
   sep = &s[0];
   strsep(&sep,"\n");
-  printf("%d",artistshared[a]);
+  //printf("%d",artistshared[a]);
 while(artistshared[a]){
 //   //  printf("%s vs. ",s);
 //   printf("%s\n",get_artist(artistshared[a]));
@@ -238,10 +238,10 @@ while(artistshared[a]){
        char * path=getPath(shmd);
 //printf("path: %s",path);
   strcat(songs,path);
-  printf("songs: %s",songs);
+  //printf("songs: %s",songs);
     command[1]=songs;
-    printf("%s",command[1]);
-      printf("In here");
+    //printf("%s",command[1]);
+      //printf("In here");
       cpid = fork();
       if (cpid){
         signal(SIGINT,handle_sig);
@@ -316,7 +316,7 @@ if (strcmp(s,"CREATE")==0){
     fgets(name,100,stdin);
     sep = &name[0];
     strsep(&sep,"\n");
-    printf("\tYour playlist: %s\n", name);
+    //printf("\tYour playlist: %s\n", name);
 
     //create file for playlist
     int fd = open(strcat(name, ".txt"), O_CREAT | O_RDWR, O_APPEND | O_RDWR);
