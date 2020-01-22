@@ -43,6 +43,7 @@ int initmem(){
   shmget(KEY,TAB_SIZE, IPC_CREAT | 0644);
   return i;
 }
+
 static void handle_sig(int signo){
   printf("Signal is: %d\n",signo);
   if (signo==SIGINT){
@@ -83,7 +84,7 @@ i=initmem();
   printf("Type CREATE to create a new playlist\n");
   printf("Type BROWSE to browse the library\n");
       //type artist, song title, album
-  printf("To delete your library, re-populate it\n");
+  printf("Type DELETE to delete the library. Then exit and restart.\n");
   printf("Type EXIT to exit the program\n");
   printf("\nEnter your selection: ");
 
@@ -358,23 +359,24 @@ if (strcmp(s,"CREATE")==0){
   }
 
 }
-// if (strcmp(s,"DELETE")==0){
-// //   int a;
-// //   for ( a=0;a<i;a++){
-// //   shmd=shmget(KEY2+a,SEG_SIZE,0);
-// //   q=shmctl(shmd,IPC_RMID,0);
-// // }
-// // shmd=shmget(KEY,TAB_SIZE,0);
-// // //printf("%d",shmd);
-// // q=shmctl(shmd,IPC_RMID,0);
+ if (strcmp(s,"DELETE")==0){
+  int a;
+ for ( a=0;a<i;a++){
+   shmd=shmget(KEY2+a,SEG_SIZE,0);
+   q=shmctl(shmd,IPC_RMID,0);
+ }
+shmd=shmget(KEY,TAB_SIZE,0);
+ printf("%d",shmd);
+ q=shmctl(shmd,IPC_RMID,0);
 //
 //   del_library(i);
 //   library_created = 0;
-// //clear_library();
-// printf("Library deleted.\n");
-// }
+// clear_library();
+printf("Library deleted.\n");
+}
 
 }
   shmdt(data);
   printf("\nExiting the program.\n");
+  exit(0);
 }

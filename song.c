@@ -27,8 +27,8 @@ int initSong(char pathp[150],int i,int max) {
   data = (struct song_node *) shmat(shmd,0,0);
   data->next = 0;
   strncpy(data->path, pathp, 150);//puts path onto shared memory pieces
-    printf("%s and %d", data->path,data->next);
-  printf("This is in init: %s",data->path);
+  //  printf("%s and %d", data->path,data->next);
+  //printf("This is in init: %s",data->path);
 
 //detatch shared memory
   int status = shmdt(data);
