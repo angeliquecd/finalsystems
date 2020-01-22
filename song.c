@@ -311,6 +311,7 @@ struct song_node * getNthNode(int n) {
   i=0;
 
   while (artistshared[i] != 0) {
+    printf("num: %d\n", num);
     //printf("checking bucket %d | num = %d\n", i, num );
     curSong = (struct song_node * )shmat(artistshared[i], 0, 0);
     if (curSong == -1) printf("error shmatting: %s", strerror(errno));
@@ -322,9 +323,10 @@ struct song_node * getNthNode(int n) {
       if (status == -1) printf("error shmdting: %s.", strerror(errno));
       return curSong;
     }
-    if (curSong->next == 0) num ++;
+    num ++;
     while (curSong->next != 0) {
       //printf("num=%d\n",num);
+      printf("num: %d\n", num);
       print_song(curSong);
       //check to see if num = n:
       if (num == n) {
@@ -386,12 +388,12 @@ int print_library() {
    while (lookat[i]){
      //printf("ID is: %d",lookat[i]);
      cur = (struct song_node *) shmat(lookat[i], 0, 0);
-    printf("BUCKET: %s\n", cur->artist);
+    printf("ARTIST: %s\n", cur->artist);
     shmdt(cur);
   //   // printf("shmd: %d\n", artists[i]);
     num = print_list(lookat[i], num);
     i++;
-     printf("checking next bucket...%d\n",i);
+     //printf("checking next bucket...%d\n",i);
   //   //i++;
 //  i++;
    }
@@ -399,6 +401,20 @@ shmdt(artistshared);
 return num;
 }
 
+void print_playlists() {
+  DIR * dir = malloc(sizeof(DIR *));
+  dir = opendir("./");
+  struct dirent * cur = readdir(dir);
+  char * fname;
+  while (cur != NULL) {
+    if (cur->d_type != DT_DIR && strstr(cur->d_name, ".txt")) {
+      fname = cur->d_name;
+      fname = strsep(&fname, ".txt");
+      printf("\t%s\n", fname);
+    }
+    cur = readdir(dir);
+  }
+}
 
 //prompts user to enter data for a song, fills in this data to struct
 void enter_song_data(int shmd, struct song_node * myNode) {
@@ -452,7 +468,7 @@ void initialize_table() {
 }
 
 void add_song(int newSongshmd) {
-  printf("adding ");
+  //printf("adding ");
   int i=0;
   int shmd2, status;
   //song to be added
@@ -470,11 +486,11 @@ void add_song(int newSongshmd) {
   struct song_node * curSong;
   int placed = 0;
 
-  printf("ARTISTS:\n");
-  while(artistshared[i]) {
-    printf("shmd:%d\n", artistshared[i]);
-    i++;
-  }
+  // printf("ARTISTS:\n");
+  // while(artistshared[i]) {
+  //   printf("shmd:%d\n", artistshared[i]);
+  //   i++;
+  // }
   i=0;
 
   //loop through albums to see if album already added
@@ -486,11 +502,11 @@ void add_song(int newSongshmd) {
     //printf("\tchecking \n");
     //print_song(curSong);
     //found album!
-    printf("comparing to shmd %d:\n", shmd2);
-    printf("\t%s\n", curSong->artist);
-    printf("\t%s\n", newSong->artist);
+    // printf("comparing to shmd %d:\n", shmd2);
+    // printf("\t%s\n", curSong->artist);
+    // printf("\t%s\n", newSong->artist);
     if (strcmp(newSong->artist, curSong->artist) == 0) {
-      printf("Artist matched! Placing at [%d]\n",i);
+      //printf("Artist matched! Placing at [%d]\n",i);
       //loop until end of songs in album to place new song
       while(curSong->next) {
         shmd2 = curSong->next;
@@ -505,7 +521,7 @@ void add_song(int newSongshmd) {
   }
   //didn't find album in list, add to end
   if (placed == 0) {
-    printf("Making new bucket. placing at [%d]\n",i);
+    //printf("Making new bucket. placing at [%d]\n",i);
     artistshared[i] = newSongshmd;
   }
 
@@ -528,7 +544,7 @@ char * get_title(int id){
   } //else printf("success shmating to get artist!\n");
 strcpy(out,first->song_name);
 shmdt(first);
-printf("Get title returning: %s",out);
+//printf("Get title returning: %s",out);
   return out;
 }
 
