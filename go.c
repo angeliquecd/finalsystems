@@ -76,7 +76,7 @@ int main(int argc, char *argsv[]){
   char * sep;
   struct song_node *data;
 i=initmem();
-  printf("\nWelcome to the music center! How would you like to proceed?\n\n\n");
+  printf("\nWelcome to the music center! How would you like to proceed?\n\n");
     while (strcmp(s,"EXIT")!=0){
   printf("Type POPULATE to populate the library\n");//temporary button
   printf("Type PLAY to play music\n");
@@ -137,12 +137,12 @@ if (strcmp(s,"SONG")==0){
  printf("\n\nCURRRENTLY PLAYING: %s\n",command[1]);
    cpid=fork();
    if (cpid){//parent
-     printf("%d in sigint",cpid);
+  //   printf("%d in sigint",cpid);
      signal(SIGINT,handle_sig);
      wait (&status);
    }
    else
-   {  printf("%d not in sigint",cpid);
+   { // printf("%d not in sigint",cpid);
      execvp("play",command);
    }
    shmdt(song);
@@ -175,6 +175,7 @@ if (strcmp(s,"PLAYLIST")==0){
   printf("Songs in playlist '%s':\n", s);
   while (buff) {
     token = strsep(&buff, "\n");
+  //  printf("Token: %s",token);
     //if token is a path name (sometimes spacing is weird)
     if (strlen(token) > 0) {
       fpaths[i] = token;

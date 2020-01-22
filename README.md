@@ -12,7 +12,7 @@ Instructions
 1. Compile the project by typing make , then run it by typing ./go . You will see a screen prompting you with the various actions you can take with the Library
 3. To start, type POPULATE, in all-caps as shown, and fill in the music library with information about the built-in files. This is a one-time only action. Trying to play or browse without populating the library will result in an empty library.
 4. You can then choose to browse the library, create a playlist, play music, exit the library or delete it entirely. Follow the prompts to complete each action
-5. When prompted, always type your choice in all-caps as a single word
+5. When prompted, always type your choice in all-caps as a single word, unless it is a name or title
   e.g If asked: "Would you like to play a SONG, PLAYLIST, GENRE or ALBUM?"" Type "ALBUM" to play an album.
 6. To pause a song, hit ctrl-z while the song is playing. To stop a song, hit ctrl-c while the song is playing.
 7. The only way to change the information about a single song is to repopulate the entire library.
@@ -21,3 +21,4 @@ Instructions
 
 Bugs:
 1. After you delete the library, you can't repopulate it. You must exit and start the program again.
+2. There are warnings after compiling, but they don't seem to affect the running of the program
