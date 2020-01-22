@@ -64,12 +64,12 @@ static void handle_sig(int signo){
 
 int main(int argc, char *argsv[]){
   int shmd, q;
-  int library_created = 0;
+  int library_created = 1;
   //see if artists[0] has shmd in it to see if library was created.
   shmd = shmget(KEY, TAB_SIZE, 0);
-  int * arts = (int *) shmat(shmd, 0, 0);
-  if (arts[0]) library_created = 1;
-  shmdt(arts); 
+  // int * arts = (int *) shmat(shmd, 0, 0);
+  // if (arts[0]) library_created = 1;
+  // shmdt(arts);
 
   int i=0;
   char s[100];
@@ -205,7 +205,8 @@ if (strcmp(s,"POPULATE")==0){
   // shmd=shmget(KEY2,1,0);
   //   data=( struct song_node *) shmat(shmd,0,0);
   // printf("%p or %d",data,shmd);
-  clear_library();
+  // clear_library();
+
   initialize_table();
   populate_songs(i);
   library_created = 1;
@@ -243,6 +244,7 @@ if (strcmp(s,"CREATE")==0){
     char * path;
     char * input = malloc(10); //user input used throughout.
     char * done = malloc(10); //is user done creating playlist ("y" / "n")
+    struct song_node * song;
     //done = "n";
     //makes a lil shell where you can write to playlists
     //i think we agreed that playlists are text files w a list of song addresses
@@ -256,7 +258,7 @@ if (strcmp(s,"CREATE")==0){
     printf("\tYour playlist: %s\n", name);
 
     //create file for playlist
-    int fd = open(strcat(name, ".txt"), O_CREAT | O_RDWR, O_APPEND | 0644);
+    int fd = open(strcat(name, ".txt"), O_CREAT | O_RDWR, O_APPEND | O_RDWR);
     if (fd < 0) printf("errno %d error: %s\n", errno, strerror(errno));
 
     printf("Playlist '%s' started!\n", name);
@@ -271,7 +273,6 @@ if (strcmp(s,"CREATE")==0){
       //printf("You entered: %s\n", input);
       //convert string input to int id:
       id = atoi(input);
-      //printf("Adding id: %d\n", id);
 
       //user entered non-number
       if (id == 0) {
@@ -285,9 +286,13 @@ if (strcmp(s,"CREATE")==0){
       else {
         // sprintf(input, "%d", id);
         // status = write(fd, input, sizeof(input));
-        path = getNthNode(id)->path; // <- doesn't work but eventually will be code to get the path based on id
+        song = getNthNode(id); // <- doesn't work but eventually will be code to get the path based on id
+        path = song->path;
+        printf("\tAdding: ");
+        print_song(song);
+
         strcat(path,"\n");
-        status = write(fd, path, sizeof(path));
+        status = write(fd, path, strlen(path));
         if (status == 0) printf("errno %d error: %s\n", errno, strerror(errno));
       }
       printf("Are you done building the playlist? y/n ");
