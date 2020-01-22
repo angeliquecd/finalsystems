@@ -311,6 +311,7 @@ struct song_node * getNthNode(int n) {
   i=0;
 
   while (artistshared[i] != 0) {
+    //printf("checking bucket %d | num = %d\n", i, num );
     curSong = (struct song_node * )shmat(artistshared[i], 0, 0);
     if (curSong == -1) printf("error shmatting: %s", strerror(errno));
     //there is a next song linked to current song: increment num
@@ -321,8 +322,9 @@ struct song_node * getNthNode(int n) {
       if (status == -1) printf("error shmdting: %s.", strerror(errno));
       return curSong;
     }
+    if (curSong->next == 0) num ++;
     while (curSong->next != 0) {
-      printf("num=%d\n",num);
+      //printf("num=%d\n",num);
       print_song(curSong);
       //check to see if num = n:
       if (num == n) {
