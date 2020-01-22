@@ -41,9 +41,11 @@ void clear_library(){
   int i=0;
   int temp_shmid;
   struct song_node * cur;
-  while(artists[i]) {
-    temp_shmid = artists[i];
-    cur = shmat(artists[i], 0, 0);
+  int shmid = shmget(KEY, TAB_SIZE, 0);
+  int * artistshared = shmat(shmid, 0, 0);
+  while(artistshared[i]) {
+    temp_shmid = artistshared[i];
+    cur = shmat(artistshared[i], 0, 0);
     while (cur->next){
       printf("\tREMOVING %d\n", temp_shmid);
       shmdt(cur);
@@ -54,6 +56,32 @@ void clear_library(){
     //shmctl(artists[i], IPC_RMID, NULL);
     i++;
   }
+  i = shmdt(artistshared);
+  if (i==-1) printf("error shmdting: %s", strerror(errno));
+}
+
+//i is the # of shared memory segments initialized
+void del_library(int i) {
+  int a, shmd, q;
+  for ( a=0;a<i;a++){
+    shmd=shmget(KEY2+a,SEG_SIZE,0);
+    q=shmctl(shmd,IPC_RMID,0);
+  }
+  shmd=shmget(KEY,TAB_SIZE,0);
+  //printf("%d",shmd);
+  int * artistshared = (int *) shmat(shmd, 0, 0);
+  artistshared[0] = 0;
+  a = shmdt(artistshared);
+  if (a==-1) printf("error shmdting: %s", strerror(errno));
+  q=shmctl(shmd,IPC_RMID,0);
+
+  // //delete artistshared
+  // int shmid = shmget(KEY, TAB_SIZE, 0);
+  // int * artistshared = shmat(shmid, 0, 0);
+  // initialize_table();
+  // artistshared = artists;
+  // a = shmdt(artistshared);
+  // if (a==-1) printf("error shmdting: %s", strerror(errno));
 }
 
 struct song_node * populate_songs(int num) {
@@ -75,7 +103,7 @@ struct song_node * populate_songs(int num) {
     struct dirent * cur = readdir(dir);
 int times=0;
     struct stat * info; //var to store status of each file
-    char fpath[150]; //stores file path
+    char fpath[100]; //stores file path
     //make names into arrays to use with strcpy
     while (cur != NULL) {
     //  while(times<1){
@@ -83,6 +111,7 @@ int times=0;
       //check that entry is not a directory
       if (cur->d_type != DT_DIR) {
         strcpy(fpath, cur->d_name);
+        //strcat(temp, fpath);
         printf("file: %s\n", fpath);
         // printf("i: %d\n", i);
         shmd = initSong(fpath,i,num);
@@ -158,7 +187,7 @@ int print_list(int shmd, int num) {
   //loop which stops once there is no next node.
   while (shmd) {
     //printf("shmd:%d\n", shmd);
-    shmd = print_song_shmd(shmd, num);
+    shmd = print_song_shmd(shmd, num+1);
     num++;
     // printf("next song in bucket...\n");
   }
@@ -273,20 +302,32 @@ struct song_node * getNthNode(int n) {
   //get shared memory artists table
   int shmd2=shmget(KEY,TAB_SIZE,0);
   int * artistshared = (int *) shmat(shmd2,0,0);
-  memcpy(artistshared, artists, TAB_SIZE);
-  shmdt(artistshared);
+  // memcpy(artistshared, artists, TAB_SIZE);
+  // shmdt(artistshared);
+  while (artistshared[i] != 0) {
+    printf("\tshmid: %d\n", artistshared[i]);
+    i++;
+  }
+  i=0;
 
   while (artistshared[i] != 0) {
     curSong = (struct song_node * )shmat(artistshared[i], 0, 0);
     if (curSong == -1) printf("error shmatting: %s", strerror(errno));
     //there is a next song linked to current song: increment num
-    printf("hi\n");
-    print_song(curSong);
+    //printf("hi\n");
+    //print_song(curSong);
+    if (num == n) {
+      status = shmdt(artistshared);
+      if (status == -1) printf("error shmdting: %s.", strerror(errno));
+      return curSong;
+    }
     while (curSong->next != 0) {
       printf("num=%d\n",num);
       print_song(curSong);
       //check to see if num = n:
       if (num == n) {
+        status = shmdt(artistshared);
+        if (status == -1) printf("error shmdting: %s.", strerror(errno));
         return curSong;
       }
       shmd = curSong->next;
@@ -298,6 +339,8 @@ struct song_node * getNthNode(int n) {
     if (status == -1) printf("error shmdting: %s", strerror(errno));
     i++;
   }
+  status = shmdt(artistshared);
+  if (status == -1) printf("error shmdting: %s.", strerror(errno));
   return NULL;
 }
 
@@ -325,7 +368,7 @@ struct song_node * getNode(int id) {
 int print_library() {
 //printf("Here\n");
    int i=0;
-  int num=1;
+  int num=0;
    int shmd;
    char * artist;
    struct song_node * cur;
@@ -416,7 +459,9 @@ void add_song(int newSongshmd) {
 
   //get artists table
   shmd2=shmget(KEY,TAB_SIZE,0);
-  int * artistshared = (int *) shmat(shmd2,0,0);
+  // int * artistshared = (int *) shmat(shmd2,0,0); <-- shamtting artistshared didn't update
+  // shmdt(artistshared);
+  int * artistshared = artists;
   // memcpy(artistshared, artists, TAB_SIZE);
   // shmdt(artistshared);
 
@@ -466,9 +511,9 @@ void add_song(int newSongshmd) {
   status=shmdt(newSong);
   if (status == -1) printf("1error shmdting: %s", strerror(errno));
   //detach artists table
-  status = shmdt(artistshared);
-  if (status == -1) printf("2error shmdting: %s", strerror(errno));
-  //free(curSong);
+  // status = shmdt(artistshared);
+  // if (status == -1) printf("2error shmdting: %s", strerror(errno));
+  // //free(curSong);
 
 }
 char * get_title(int id){
