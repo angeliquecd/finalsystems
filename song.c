@@ -183,7 +183,7 @@ char * get_artist(int place) {
   printf("\tbucket node: ");
   print_song(first);
   if (first == NULL) {
-    printf("error shmating for shmd=%d\n", place);
+    printf("error shmating for shmd=%d. %s\n", place, strerror(errno));
     return out;
 
   } //else printf("success shmating to get artist!\n");
@@ -214,12 +214,16 @@ int findIdInList(int num, int id) {
   if (shmd == 0) return -1;
   //if it's not null:
   //loop which stops once there is no next node.
+  printf("checking: ");
   while (shmd) {
     shmd = newNode->next;
     status = shmdt(newNode);
     if (status == -1) printf("error shmdting: %s", strerror(errno));
     num++;
-    if (num == id) return num;
+    if (num == id) {
+      printf("matched! \n");
+      return num;
+    }
   }
   return num; //id never matched num
 }
@@ -260,11 +264,48 @@ printf("Get path returning: %s\n",out);
 //  printf("[]%s %s]",first->path,first->song_name);
   return out;}
 
+struct song_node * getNthNode(int n) {
+  struct song_node * curSong;
+  int i=0; //index of artists array
+  int num = 1; //iterating through each song until you reach n.
+  int status, shmd;
+  void * shmat_status;
+  //get shared memory artists table
+  int shmd2=shmget(KEY,TAB_SIZE,0);
+  int * artistshared = (int *) shmat(shmd2,0,0);
+  memcpy(artistshared, artists, TAB_SIZE);
+  shmdt(artistshared);
+
+  while (artistshared[i] != 0) {
+    curSong = (struct song_node * )shmat(artistshared[i], 0, 0);
+    if (curSong == -1) printf("error shmatting: %s", strerror(errno));
+    //there is a next song linked to current song: increment num
+    printf("hi\n");
+    print_song(curSong);
+    while (curSong->next != 0) {
+      printf("num=%d\n",num);
+      print_song(curSong);
+      //check to see if num = n:
+      if (num == n) {
+        return curSong;
+      }
+      shmd = curSong->next;
+      shmdt(curSong);
+      curSong = shmat(shmd, 0, 0);
+      num++;
+    }
+    status = shmdt(curSong);
+    if (status == -1) printf("error shmdting: %s", strerror(errno));
+    i++;
+  }
+  return NULL;
+}
+
 struct song_node * getNode(int id) {
   char * path;
   int i=0;
   int num=1;
-  while (artists[i] && num < id) {
+  while (artists[i] != 0 && num < id) {
     num = findIdInList(num, id);
     //if shmd was invalid
     if (num == -1) {
@@ -357,35 +398,44 @@ void enter_song_data(int shmd, struct song_node * myNode) {
 
 //SONG LIBRARY FUNCTIONS----------------------------
 void initialize_table() {
+  //int shmd = shmget(KEY, TAB_SIZE, 0);
   int i=0;
   for (int i=0;i<100;i++) {
     artists[i] = 0;
   }
+
 }
 
 void add_song(int newSongshmd) {
   printf("adding ");
   int i=0;
   int shmd2, status;
+  //song to be added
   struct song_node * newSong = (struct song_node * ) shmat(newSongshmd,0,0);
-  print_song(newSong);
+  //print_song(newSong);
+
+  //get artists table
+  shmd2=shmget(KEY,TAB_SIZE,0);
+  int * artistshared = (int *) shmat(shmd2,0,0);
+  // memcpy(artistshared, artists, TAB_SIZE);
+  // shmdt(artistshared);
 
   struct song_node * curSong;
   int placed = 0;
 
   printf("ARTISTS:\n");
-  while(artists[i]) {
-    printf("shmd:%d\n", artists[i]);
+  while(artistshared[i]) {
+    printf("shmd:%d\n", artistshared[i]);
     i++;
   }
   i=0;
 
   //loop through albums to see if album already added
-  while (artists[i] != 0 && placed == 0) {
+  while (artistshared[i] != 0 && placed == 0) {
     //printf("shmd = %d. artist here: %s", artists[i], get_artist(i));
-    shmd2 = artists[i];
+    shmd2 = artistshared[i];
     curSong = (struct song_node * )shmat(shmd2,0,0);
-    if (curSong == NULL) printf("error shmating. %s\n", strerror(errno));
+    if (curSong == -1) printf("error shmating. %s\n", strerror(errno));
     //printf("\tchecking \n");
     //print_song(curSong);
     //found album!
@@ -409,13 +459,15 @@ void add_song(int newSongshmd) {
   //didn't find album in list, add to end
   if (placed == 0) {
     printf("Making new bucket. placing at [%d]\n",i);
-    artists[i] = newSongshmd;
+    artistshared[i] = newSongshmd;
   }
 
   //detach song nodes
   status=shmdt(newSong);
   if (status == -1) printf("1error shmdting: %s", strerror(errno));
-
+  //detach artists table
+  status = shmdt(artistshared);
+  if (status == -1) printf("2error shmdting: %s", strerror(errno));
   //free(curSong);
 
 }
