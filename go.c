@@ -45,8 +45,10 @@ int initmem(){
 }
 static void handle_sig(int signo){
   printf("Signal is: %d",signo);
-  if (signo==SIGINT)
-  {printf("Stopping player.\n");
+  if (signo==SIGINT){
+    printf("Stopping player.\n");
+    exit(0);
+  }
   //kill(cpid, 9);}
   if (signo==SIGSTOP){
     printf("Pausing player.\n");
@@ -56,7 +58,6 @@ static void handle_sig(int signo){
     printf("Resuming player.\n");
     //kill(cpid, SIGCONT);
   }
-}
 }
 
 int main(int argc, char *argsv[]){
