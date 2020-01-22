@@ -44,7 +44,7 @@ int initmem(){
   return i;
 }
 static void handle_sig(int signo){
-  printf("Signal is: %d",signo);
+  printf("Signal is: %d\n",signo);
   if (signo==SIGINT){
     printf("Stopping player.\n");
     exit(0);
