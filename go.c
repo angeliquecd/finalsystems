@@ -134,19 +134,7 @@ if (strcmp(s,"SONG")==0){
   strcat(fpath, sep);
 
   command[1] = fpath;
-
-  // sep = &s[0];
-  // strsep(&sep,"\n");
-  // printf("%d",artistshared[a]);
-  // while(artistshared[a]){
-  // shmd=artistshared[a];
-  // while (shmd){
-  // if (strcmp(s,get_title(shmd))==0){
-  //   printf("In here.\n");
-  //   char * path=getPath(shmd);
-  //   strcat(songs,path);
-  //   printf("songs: %s",songs);
- printf("\n\nCURRRENTLY PLAYING; %s\n",command[1]);
+ printf("\n\nCURRRENTLY PLAYING: %s\n",command[1]);
    cpid=fork();
    if (cpid){//parent
      printf("%d in sigint",cpid);
@@ -224,10 +212,12 @@ if (strcmp(s,"PLAYLIST")==0){
   //free(buff);
 }
 if (strcmp(s,"ARTIST")==0){
+  num = print_library();
   printf("Enter the artist name: ");
   fgets(s,100,stdin);
   sep = &s[0];
   strsep(&sep,"\n");
+  a=0;
   //printf("%d",artistshared[a]);
 while(artistshared[a]){
 //   //  printf("%s vs. ",s);
@@ -235,6 +225,7 @@ while(artistshared[a]){
  if (strcmp(s,get_artist(artistshared[a]))==0){
    shmd=artistshared[a];
   while(shmd){
+    strncpy(songs,"songs/",100);
        char * path=getPath(shmd);
 //printf("path: %s",path);
   strcat(songs,path);
