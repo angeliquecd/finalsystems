@@ -236,6 +236,7 @@ while(artistshared[a]){
    shmd=artistshared[a];
   while(shmd){
        char * path=getPath(shmd);
+       //resets song path
 //printf("path: %s",path);
   strcat(songs,path);
   //printf("songs: %s",songs);
