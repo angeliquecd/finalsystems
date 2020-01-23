@@ -27,8 +27,8 @@ int initSong(char pathp[150],int i,int max) {
   data = (struct song_node *) shmat(shmd,0,0);
   data->next = 0;
   strncpy(data->path, pathp, 150);//puts path onto shared memory pieces
-    printf("%s and %d", data->path,data->next);
-  printf("This is in init: %s",data->path);
+  //  printf("%s and %d", data->path,data->next);
+  //printf("This is in init: %s",data->path);
 
 //detatch shared memory
   int status = shmdt(data);
@@ -137,7 +137,7 @@ int times=0;
     shmdt(artistshared);
     shmd2=shmget(KEY,TAB_SIZE,0);
     artistshared = (int * ) shmat(shmd2,0,0);
-    printf("shared memory: [%d] [%d]",artistshared[0],artistshared[1]);
+//    printf("shared memory: [%d] [%d]",artistshared[0],artistshared[1]);
     shmdt(artistshared);
     return song;
   }
@@ -205,11 +205,11 @@ int print_list(int shmd, int num) {
 
 //returns artist associated with given index/bucket in artists table
 char * get_artist(int place) {
-  char * out;
+  char out[100];
   int status;
   struct song_node * first = (struct song_node * ) shmat(place, 0, 0);
   if (first == NULL) printf("error shamtting: %s", strerror(errno));
-  printf("\tbucket node: ");
+//  printf("\tbucket node: ");
   print_song(first);
   if (first == NULL) {
     printf("error shmating for shmd=%d. %s\n", place, strerror(errno));
@@ -220,7 +220,7 @@ char * get_artist(int place) {
   // return first->artist;
   printf("\tartist: %s\n", first->artist);
   strcpy(out,first->artist);
-  //printf("artist: %s\n", out);
+//  printf("artist again: %s\n", out);
 
   //detach shared memory
   status = shmdt(first);
@@ -243,14 +243,14 @@ int findIdInList(int num, int id) {
   if (shmd == 0) return -1;
   //if it's not null:
   //loop which stops once there is no next node.
-  printf("checking: ");
+  //printf("checking: ");
   while (shmd) {
     shmd = newNode->next;
     status = shmdt(newNode);
     if (status == -1) printf("error shmdting: %s", strerror(errno));
     num++;
     if (num == id) {
-      printf("matched! \n");
+    //  printf("matched! \n");
       return num;
     }
   }
@@ -279,14 +279,14 @@ struct song_node * getNodeFromList(int id, int i, int num) {
 char * getPath(int place) {
   char * out;
   int status;
-  printf("Get path starting");
+  //printf("Get path starting");
   struct song_node * first = shmat(place, 0, 0);
   if (first == NULL) {
     printf("error shmating for shmd=%d\n", place);
     return out;
   } //else printf("success shmating to get artist!\n");
 out=first->path;
-printf("Get path returning: %s\n",out);
+//printf("Get path returning: %s\n",out);
 
 //shmdt(first);
   //return out;
@@ -305,13 +305,13 @@ struct song_node * getNthNode(int n) {
   // memcpy(artistshared, artists, TAB_SIZE);
   // shmdt(artistshared);
   while (artistshared[i] != 0) {
-    printf("\tshmid: %d\n", artistshared[i]);
+    //printf("\tshmid: %d\n", artistshared[i]);
     i++;
   }
   i=0;
 
   while (artistshared[i] != 0) {
-    printf("num: %d\n", num);
+    //printf("num: %d\n", num);
     //printf("checking bucket %d | num = %d\n", i, num );
     curSong = (struct song_node * )shmat(artistshared[i], 0, 0);
     if (!curSong) printf("error shmatting: %s", strerror(errno));
@@ -326,7 +326,7 @@ struct song_node * getNthNode(int n) {
     num ++;
     while (curSong->next != 0) {
       //printf("num=%d\n",num);
-      printf("num: %d\n", num);
+    //  printf("num: %d\n", num);
       print_song(curSong);
       //check to see if num = n:
       if (num == n) {
@@ -360,7 +360,7 @@ struct song_node * getNode(int id) {
       return NULL;
     }
     if (num == id) {
-      printf("ID found in bucket %d\n", i);
+    //  printf("ID found in bucket %d\n", i);
       return getNodeFromList(id, i, num);
     }
     i++;
@@ -558,7 +558,7 @@ int getNext(int id){
   } //else printf("success shmating to get artist!\n");
 out=first->next;
 shmdt(first);
-printf("Get next returning: %d",out);
+//printf("Get next returning: %d",out);
   return out;
 }
 

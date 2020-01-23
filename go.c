@@ -43,6 +43,7 @@ int initmem(){
   shmget(KEY,TAB_SIZE, IPC_CREAT | 0644);
   return i;
 }
+
 static void handle_sig(int signo){
   printf("Signal is: %d\n",signo);
   if (signo==SIGINT){
@@ -76,14 +77,14 @@ int main(int argc, char *argsv[]){
   char * sep;
   struct song_node *data;
 i=initmem();
-  printf("\nWelcome to the music center! How would you like to proceed?\n\n\n");
+  printf("\nWelcome to the music center! How would you like to proceed?\n\n");
     while (strcmp(s,"EXIT")!=0){
   printf("Type POPULATE to populate the library\n");//temporary button
   printf("Type PLAY to play music\n");
   printf("Type CREATE to create a new playlist\n");
   printf("Type BROWSE to browse the library\n");
       //type artist, song title, album
-  printf("To delete your library, re-populate it\n");
+  printf("Type DELETE to delete the library. Then exit and restart.\n");
   printf("Type EXIT to exit the program\n");
   printf("\nEnter your selection: ");
 
@@ -134,27 +135,15 @@ if (strcmp(s,"SONG")==0){
   strcat(fpath, sep);
 
   command[1] = fpath;
-
-  // sep = &s[0];
-  // strsep(&sep,"\n");
-  // printf("%d",artistshared[a]);
-  // while(artistshared[a]){
-  // shmd=artistshared[a];
-  // while (shmd){
-  // if (strcmp(s,get_title(shmd))==0){
-  //   printf("In here.\n");
-  //   char * path=getPath(shmd);
-  //   strcat(songs,path);
-  //   printf("songs: %s",songs);
- printf("\n\nCURRRENTLY PLAYING; %s\n",command[1]);
+ printf("\n\nCURRRENTLY PLAYING: %s\n",command[1]);
    cpid=fork();
    if (cpid){//parent
-     printf("%d in sigint",cpid);
+  //   printf("%d in sigint",cpid);
      signal(SIGINT,handle_sig);
      wait (&status);
    }
    else
-   {  printf("%d not in sigint",cpid);
+   { // printf("%d not in sigint",cpid);
      execvp("play",command);
    }
    shmdt(song);
@@ -187,6 +176,7 @@ if (strcmp(s,"PLAYLIST")==0){
   printf("Songs in playlist '%s':\n", s);
   while (buff) {
     token = strsep(&buff, "\n");
+  //  printf("Token: %s",token);
     //if token is a path name (sometimes spacing is weird)
     if (strlen(token) > 0) {
       fpaths[i] = token;
@@ -224,10 +214,12 @@ if (strcmp(s,"PLAYLIST")==0){
   //free(buff);
 }
 if (strcmp(s,"ARTIST")==0){
+  num = print_library();
   printf("Enter the artist name: ");
   fgets(s,100,stdin);
   sep = &s[0];
   strsep(&sep,"\n");
+  a=0;
   //printf("%d",artistshared[a]);
 while(artistshared[a]){
 //   //  printf("%s vs. ",s);
@@ -235,6 +227,7 @@ while(artistshared[a]){
  if (strcmp(s,get_artist(artistshared[a]))==0){
    shmd=artistshared[a];
   while(shmd){
+    strncpy(songs,"songs/",100);
        char * path=getPath(shmd);
        //resets song path
 //printf("path: %s",path);
@@ -367,23 +360,24 @@ if (strcmp(s,"CREATE")==0){
   }
 
 }
-// if (strcmp(s,"DELETE")==0){
-// //   int a;
-// //   for ( a=0;a<i;a++){
-// //   shmd=shmget(KEY2+a,SEG_SIZE,0);
-// //   q=shmctl(shmd,IPC_RMID,0);
-// // }
-// // shmd=shmget(KEY,TAB_SIZE,0);
-// // //printf("%d",shmd);
-// // q=shmctl(shmd,IPC_RMID,0);
+ if (strcmp(s,"DELETE")==0){
+  int a;
+ for ( a=0;a<i;a++){
+   shmd=shmget(KEY2+a,SEG_SIZE,0);
+   q=shmctl(shmd,IPC_RMID,0);
+ }
+shmd=shmget(KEY,TAB_SIZE,0);
+ printf("%d",shmd);
+ q=shmctl(shmd,IPC_RMID,0);
 //
 //   del_library(i);
 //   library_created = 0;
-// //clear_library();
-// printf("Library deleted.\n");
-// }
+// clear_library();
+printf("Library deleted.\n");
+}
 
 }
   shmdt(data);
   printf("\nExiting the program.\n");
+  exit(0);
 }
