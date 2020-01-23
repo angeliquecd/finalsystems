@@ -220,12 +220,12 @@ char * get_artist(int place) {
   // return first->artist;
   //printf("\tartist: %s\n", first->artist);
   strcpy(out,first->artist);
-  // printf("artist: %s\n", out);
+  //printf("artist: %s\n", out);
 
   //detach shared memory
   status = shmdt(first);
   if (status==-1) printf("erroring shmdting. %s\n", strerror(errno));
-  //printf("artist: %s\n", out);
+  printf("artist: %s\n", out);
 
   return out;
 }

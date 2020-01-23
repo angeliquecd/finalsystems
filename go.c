@@ -224,8 +224,6 @@ if (strcmp(s,"PLAYLIST")==0){
   //free(buff);
 }
 if (strcmp(s,"ARTIST")==0){
-  int i;
-  char * path;
   printf("Enter the artist name: ");
   fgets(s,100,stdin);
   sep = &s[0];
@@ -238,16 +236,11 @@ while(artistshared[a]){
  if (strcmp(s,get_artist(artistshared[a]))==0){
    shmd=artistshared[a];
   while(shmd){
-    //reset songs:
-    songs[0] = 's';
-    songs[1] = 'o';
-    songs[2] = 'n';
-    songs[3] = 'g';
-    songs[4] = 's';
-    songs[5] = '/';
-    songs[6] = 0;
-    //printf("songs: %s\n", songs);
-    path=getPath(shmd);
+    char over[100]="songs/";
+    strncpy(songs,over,100);
+    printf("songs: %s",songs);
+       char * path=getPath(shmd);
+       //resets song path
 printf("path: %s",path);
   strcat(songs,path);
   printf("songs: %s",songs);
