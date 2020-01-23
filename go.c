@@ -230,9 +230,10 @@ if (strcmp(s,"ARTIST")==0){
   fgets(s,100,stdin);
   sep = &s[0];
   strsep(&sep,"\n");
+  printf("you entered: %s\n",s);
   //printf("%d",artistshared[a]);
 while(artistshared[a]){
-   printf("\t%s vs. %s\n",s, get_artist(artistshared[a]));
+   //printf("\t%s\n vs. \t%s\n",s, get_artist(artistshared[a]));
 //   printf("%s\n",get_artist(artistshared[a]));
  if (strcmp(s,get_artist(artistshared[a]))==0){
    shmd=artistshared[a];
@@ -245,7 +246,7 @@ while(artistshared[a]){
     songs[4] = 's';
     songs[5] = '/';
     songs[6] = 0;
-    printf("songs: %s\n", songs);
+    //printf("songs: %s\n", songs);
     path=getPath(shmd);
 printf("path: %s",path);
   strcat(songs,path);
