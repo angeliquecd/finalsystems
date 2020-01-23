@@ -205,7 +205,7 @@ int print_list(int shmd, int num) {
 
 //returns artist associated with given index/bucket in artists table
 char * get_artist(int place) {
-  char out[100];
+  char * out;
   int status;
   struct song_node * first = (struct song_node * ) shmat(place, 0, 0);
   if (first == NULL) printf("error shamtting: %s", strerror(errno));
@@ -219,14 +219,14 @@ char * get_artist(int place) {
 
   // return first->artist;
   printf("\tartist: %s\n", first->artist);
-  strcpy(out,first->artist);
+  out=first->artist;
 //  printf("artist again: %s\n", out);
 
   //detach shared memory
   status = shmdt(first);
   if (status==-1) printf("erroring shmdting. %s\n", strerror(errno));
 
-  return first->artist;
+  return out;
 }
 
 //iterates through list (each artist bucket)
