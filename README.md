@@ -20,5 +20,5 @@ Instructions
 9. Exiting the program will not delete the library
 
 Bugs:
-1. After you delete the library, you can't repopulate it. You must exit and start the program again.
+1. After you delete the library, you can't repopulate it. Repopulating it gives a seg fault.
 2. There are warnings after compiling, but they don't seem to affect the running of the program
