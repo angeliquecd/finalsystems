@@ -227,7 +227,8 @@ while(artistshared[a]){
  if (strcmp(s,get_artist(artistshared[a]))==0){
    shmd=artistshared[a];
   while(shmd){
-    strncpy(songs,"songs/",100);
+    char over[100]="songs/";
+    strncpy(songs,over,100);
        char * path=getPath(shmd);
        //resets song path
 //printf("path: %s",path);
