@@ -226,7 +226,7 @@ char * get_artist(int place) {
   status = shmdt(first);
   if (status==-1) printf("erroring shmdting. %s\n", strerror(errno));
 
-  return out;
+  return first->artist;
 }
 
 //iterates through list (each artist bucket)
